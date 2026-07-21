@@ -1,0 +1,67 @@
+{
+  "hullName": "Reclaimer Arm",
+  "hullId": "arondight_reclaimer_arm",
+  "hullSize": "FRIGATE",
+  "spriteName": "graphics/arondight/ships/arondight_reclaimer_arm.png",
+  "style": "THREAT",
+  "height": 110,
+  "width": 110,
+  "center": [
+    55,
+    55
+  ],
+  "collisionRadius": 62,
+  "shieldCenter": [
+    0,
+    0
+  ],
+  "shieldRadius": 62,
+  "viewOffset": 0,
+  "moduleAnchor": [
+    -45,
+    0
+  ],
+  "builtInMods": [
+    "automated",
+    "reduced_explosion",
+    "never_detaches",
+    "vastbulk",
+    "arondight_boss_attenuation"
+  ],
+  "builtInWeapons": {
+    "WS_ARM_PD": "unstable_fragment"
+  },
+  "weaponSlots": [
+    {
+      "id": "WS_ARM_PD",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 300,
+      "angle": 0,
+      "locations": [
+        -3,
+        0
+      ]
+    }
+  ],
+  "engineSlots": [],
+  "bounds": [
+    45,
+    18,
+    18,
+    45,
+    -18,
+    45,
+    -45,
+    18,
+    -45,
+    -18,
+    -18,
+    -45,
+    18,
+    -45,
+    45,
+    -18
+  ]
+}

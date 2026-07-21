@@ -1,0 +1,23 @@
+{
+	# the duel's aimed-pressure slug (a gauss-class hit): the same 700
+	# kinetic on a sub-second beat, flying at 700 instead of 1200 — from
+	# the boss's 245su emit envelope, gauss crossed the 600-760 orbit band
+	# faster than a 140-speed frame can displace its own width; at 700 the drift
+	# dodge is honest again while a parked ship still eats every beat.
+	# Hot palette so the sniper beat reads apart from the lattice-green
+	# weather layers.
+	"id":"arondight_aimed_lance",
+	"specClass":"projectile",
+	"spawnType":"BALLISTIC",
+	"collisionClass":"PROJECTILE_FF",
+	"collisionClassByFighter":"PROJECTILE_FIGHTER",
+	"length":70.0,
+	"hitGlowRadius":70,
+	"width":18.0,
+	"fadeTime":0.4,
+	"fringeColor":[255,140,60,220],
+	"coreColor":[255,240,210,255],
+	"textureScrollSpeed":64.0,
+	"pixelsPerTexel":5.0,
+	"bulletSprite":"graphics/missiles/shell_gauss_cannon.png"
+}

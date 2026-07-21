@@ -1,0 +1,14 @@
+{
+	"id":"arondight_pulse_dud",
+	"specClass":"projectile",
+	"spawnType":"PLASMA",
+	"collisionClass":"PROJECTILE_NO_FF",
+	"collisionClassByFighter":"PROJECTILE_FIGHTER",
+	"width":10.0,
+	"fadeTime":0.3,
+	"hitGlowRadius":80,
+	"fringeColor":[120,255,200,200],
+	"coreColor":[235,255,245,255],
+	"passThroughMissiles":true,
+	"passThroughFighters":true,
+}

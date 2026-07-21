@@ -1,0 +1,282 @@
+{
+  "hullName": "Reclaimer",
+  "hullId": "arondight_reclaimer",
+  "hullSize": "CRUISER",
+  "spriteName": "graphics/arondight/ships/arondight_reclaimer.png",
+  "style": "THREAT",
+  "height": 262,
+  "width": 188,
+  "center": [
+    94,
+    143
+  ],
+  "collisionRadius": 215,
+  "shieldCenter": [
+    0,
+    0
+  ],
+  "shieldRadius": 210,
+  "viewOffset": 0,
+  "builtInMods": [
+    "automated",
+    "vastbulk",
+    "axialrotation",
+    "shared_flux_sink",
+    "arondight_boss_attenuation"
+  ],
+  "builtInWeapons": {
+    "WS_PD_L": "unstable_fragment",
+    "WS_PD_R": "unstable_fragment"
+  },
+  "weaponSlots": [
+    {
+      "id": "WS_PD_L",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 270,
+      "angle": 60,
+      "locations": [
+        88,
+        36
+      ]
+    },
+    {
+      "id": "WS_PD_R",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 270,
+      "angle": -60,
+      "locations": [
+        88,
+        -36
+      ]
+    },
+    {
+      "id": "WS_EMIT_CORE",
+      "size": "SMALL",
+      "type": "SYSTEM",
+      "mount": "HIDDEN",
+      "arc": 5,
+      "angle": 0,
+      "locations": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "WS_EMIT_N",
+      "size": "SMALL",
+      "type": "SYSTEM",
+      "mount": "HIDDEN",
+      "arc": 5,
+      "angle": 0,
+      "locations": [
+        92,
+        0
+      ]
+    },
+    {
+      "id": "WS_EMIT_NE",
+      "size": "SMALL",
+      "type": "SYSTEM",
+      "mount": "HIDDEN",
+      "arc": 5,
+      "angle": -45,
+      "locations": [
+        81,
+        -81
+      ]
+    },
+    {
+      "id": "WS_EMIT_E",
+      "size": "SMALL",
+      "type": "SYSTEM",
+      "mount": "HIDDEN",
+      "arc": 5,
+      "angle": -90,
+      "locations": [
+        0,
+        -70
+      ]
+    },
+    {
+      "id": "WS_EMIT_SE",
+      "size": "SMALL",
+      "type": "SYSTEM",
+      "mount": "HIDDEN",
+      "arc": 5,
+      "angle": -135,
+      "locations": [
+        -42,
+        -42
+      ]
+    },
+    {
+      "id": "WS_EMIT_S",
+      "size": "SMALL",
+      "type": "SYSTEM",
+      "mount": "HIDDEN",
+      "arc": 5,
+      "angle": 180,
+      "locations": [
+        -110,
+        0
+      ]
+    },
+    {
+      "id": "WS_EMIT_SW",
+      "size": "SMALL",
+      "type": "SYSTEM",
+      "mount": "HIDDEN",
+      "arc": 5,
+      "angle": 135,
+      "locations": [
+        -43,
+        43
+      ]
+    },
+    {
+      "id": "WS_EMIT_W",
+      "size": "SMALL",
+      "type": "SYSTEM",
+      "mount": "HIDDEN",
+      "arc": 5,
+      "angle": 90,
+      "locations": [
+        0,
+        71
+      ]
+    },
+    {
+      "id": "WS_EMIT_NW",
+      "size": "SMALL",
+      "type": "SYSTEM",
+      "mount": "HIDDEN",
+      "arc": 5,
+      "angle": 45,
+      "locations": [
+        82,
+        82
+      ]
+    },
+    {
+      "id": "WS_MOD_N",
+      "size": "SMALL",
+      "type": "STATION_MODULE",
+      "mount": "HARDPOINT",
+      "arc": 90,
+      "angle": 0,
+      "locations": [
+        102,
+        0
+      ]
+    },
+    {
+      "id": "WS_MOD_E",
+      "size": "SMALL",
+      "type": "STATION_MODULE",
+      "mount": "HARDPOINT",
+      "arc": 90,
+      "angle": -90,
+      "locations": [
+        0,
+        -75
+      ]
+    },
+    {
+      "id": "WS_MOD_S",
+      "size": "SMALL",
+      "type": "STATION_MODULE",
+      "mount": "HARDPOINT",
+      "arc": 90,
+      "angle": 180,
+      "locations": [
+        -135,
+        0
+      ]
+    },
+    {
+      "id": "WS_MOD_W",
+      "size": "SMALL",
+      "type": "STATION_MODULE",
+      "mount": "HARDPOINT",
+      "arc": 90,
+      "angle": 90,
+      "locations": [
+        0,
+        75
+      ]
+    }
+  ],
+  "engineSlots": [
+    {
+      "location": [
+        -135,
+        42
+      ],
+      "length": 40,
+      "width": 10,
+      "angle": 180,
+      "contrailSize": 64,
+      "style": "THREAT"
+    },
+    {
+      "location": [
+        -136,
+        30
+      ],
+      "length": 40,
+      "width": 10,
+      "angle": 180,
+      "contrailSize": 64,
+      "style": "THREAT"
+    },
+    {
+      "location": [
+        -136,
+        18
+      ],
+      "length": 40,
+      "width": 10,
+      "angle": 180,
+      "contrailSize": 64,
+      "style": "THREAT"
+    },
+    {
+      "location": [
+        -136,
+        -17
+      ],
+      "length": 40,
+      "width": 10,
+      "angle": 180,
+      "contrailSize": 64,
+      "style": "THREAT"
+    },
+    {
+      "location": [
+        -136,
+        -29
+      ],
+      "length": 40,
+      "width": 10,
+      "angle": 180,
+      "contrailSize": 64,
+      "style": "THREAT"
+    },
+    {
+      "location": [
+        -135,
+        -41
+      ],
+      "length": 40,
+      "width": 10,
+      "angle": 180,
+      "contrailSize": 64,
+      "style": "THREAT"
+    }
+  ],
+  "bounds": [98, 0, 92, 17, 97, 22, 70, 51, 70, 64, -5, 80, -11, 91, -28, 91, -33, 80, -106, 69, -114, 61, -112, 50, -132, 32, -136, 0, -132, -32, -112, -50, -114, -61, -106, -69, -33, -80, -28, -91, -11, -91, -5, -80, 70, -64, 70, -51, 97, -22, 92, -17]
+}

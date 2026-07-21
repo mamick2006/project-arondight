@@ -1,0 +1,28 @@
+{
+	"id":"arondight_ward_bulwark",
+	"type":"PHASE_CLOAK",
+	"aiType":"PHASE_CLOAK",
+
+	"statsScript":"arondight.form.mechanics.WardBulwarkSystemScript",
+
+	"canNotCauseOverload":false,
+
+	"jitterUnderColor":[215,240,255,150],
+	"jitterUnderCopies":16,
+	"jitterUnderMinRange":0,
+	"jitterUnderRange":12,
+	"jitterUnderRangeRadiusFraction":0,
+
+	"soundFilterType":"LOWPASS",
+	"soundFilterGain":0.8,
+	"soundFilterGainHF":0.3,
+
+	"fadeActivationSoundOnChargedown":true,
+	"useSound":"system_damper",
+	"loopSound":"system_damper_loop",
+	"deactivateSound":"system_damper_off",
+	"outOfUsesSound":"gun_out_of_ammo",
+
+	"aiHints":{
+	}
+}

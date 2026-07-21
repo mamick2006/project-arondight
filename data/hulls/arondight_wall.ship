@@ -1,0 +1,17 @@
+{
+  "hullName": "Loom Barrier",
+  "hullId": "arondight_wall",
+  "hullSize": "CRUISER",
+  "spriteName": "graphics/arondight/ships/arondight_loom_wall.png",
+  "style": "LOW_TECH",
+  "height": 512,
+  "width": 128,
+  "center": [64, 256],
+  "collisionRadius": 270,
+  "shieldCenter": [0, 0],
+  "shieldRadius": 0,
+  "viewOffset": 0,
+  "weaponSlots": [],
+  "engineSlots": [],
+  "bounds": [248, -60, 248, 60, -248, 60, -248, -60]
+}

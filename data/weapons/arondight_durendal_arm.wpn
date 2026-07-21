@@ -1,0 +1,17 @@
+{
+	"id":"arondight_durendal_arm",
+	"specClass":"projectile",
+	"type":"BALLISTIC",
+	"size":"SMALL",
+	"turretSprite":"graphics/arondight/ships/parts/arondight_durendal_arm_r.png",
+	"hardpointSprite":"graphics/arondight/ships/parts/arondight_durendal_arm_r.png",
+	"turretOffsets":[16, 0],
+	"turretAngleOffsets":[0],
+	"hardpointOffsets":[16, 0],
+	"hardpointAngleOffsets":[0],
+	"barrelMode":"LINKED",
+	"animationType":"NONE",
+	"renderHints":[RENDER_BARREL_BELOW],
+	"projectileSpecId":"arondight_shell",
+	"fireSoundTwo":"hellbore_fire",
+}

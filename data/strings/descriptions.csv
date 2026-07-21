@@ -1,0 +1,39 @@
+id,type,text1,text2,text3,text4,text5,notes
+arondight_base,SHIP,"A crewed cataphract frame recovered from a derelict research habitat, grown around a fabricator lattice rather than assembled. The lattice re-grows the hull to suit its pilot, and no two certified configurations weigh, handle, or scan alike. The research cell named each one for a blade out of Old Earth legend. Nothing in the surviving logs says what the lattice itself was grown from.",,,,,
+arondight_durendal,SHIP,"The first configuration the research cell certified, and the pattern for everything after it. Durendal anchors a line, holds ground other ships would abandon, and teaches its pilots calm. The name belongs to a sword that could not be broken.",,,,,
+arondight_hauteclere,SHIP,"Hauteclere is the duelist's cut of Durendal, rebuilt for pilots who would rather answer a blow than outlast it. The configuration has heavy demands of its pilots.",,,,,
+arondight_joyeuse,SHIP,"The emperor's blade stood for peace, which the research cell read as an instruction about fortification. Joyeuse is the escort configuration: it puts itself between the convoy and the guns. Crews standing behind one learn to trust its defenses.",,,,,
+arondight_longinus,SHIP,"Longinus shoots from outside the battle. The configuration trades armor, speed, and every close-in consideration for reach, and its fire arrives without warning or apparent origin.
+
+Every mounted weapon has 3x range.",,,,,
+arondight_gaebolg,SHIP,"Named for a spear that killed whenever it was thrown, shots from Gae Bolg are decisive. It destroys fortified positions in single strikes, as long as those shots hit.
+
+Every weapon deals 3x damage and has 2x range, but consumes double ammo and locks for 5 seconds after it fires. If there is insufficient ammo, the frame takes half of the weapon's damage. Destroying a ship removes the lock.",,,,,
+arondight_rhongomyniad,SHIP,"The king's lance was a pillar before it was a weapon. Rhongomyniad is the siege configuration: it plants itself, aims at a single mark, and trusts its escorts to handle defense.
+
+Every weapon has 2x range. Its arm is a continuous beam that ramps up to 4x damage over 6 seconds on a single target. Your top speed drops to 5% while it fires, and switching targets resets the ramp.",,,,,
+arondight_curtana,SHIP,"Curtana carries the sword of mercy, the blade with its point struck off, an edge that hardly cuts at all. Certified doctrine is to close, touch, and hold.
+
+As long as its arm beam is hitting a ship's hull, that ship is slowed to 50% timeflow.",,,,,
+arondight_clarent,SHIP,"Clarent fights like Curtana with the mercy removed, and it returns from trials in better repair than it left. Targets are frozen in time instead of merely slowed.
+
+As long as its arm beam is hitting a ship's hull, the beam's target is frozen, you vent flux twice as fast, weapon cooldowns are decreased by 50%, and you drain 15 hull per second from the target.",,,,,
+arondight_fragarach,SHIP,"Fragarach is the squadron configuration. Wings flying with one are a half-step ahead of every exchange, and their sortie plans carry noticeably thin contingency annexes. Old Earth remembered the blade as the Answerer.
+
+The beam becomes a radial pulse. When fired, enemy units within 800 units are slowed by 35% for 4 seconds, and allies are sped up.",,,,,
+arondight_shift,SHIP_SYSTEM,"Throws the frame a short distance along its facing, the lattice re-weaves the hull around the jump rather than pushing it through.",,,,,
+arondight_spotter,SHIP_SYSTEM,"Marks a single target. The target takes increased damage from all sources.",,,,,
+arondight_ward,SHIP_SYSTEM,"Instantly raises a barrier that while active blocks all damage with no flux cost per hit. 50% of any blocked damage returns to the attacker as an EMP arc. Generates 900 hard flux per second, and has a two-second cooldown between activations.",,,,,
+arondight_ward_flash,SHIP_SYSTEM,"Instantly raises a barrier that while active blocks all damage with no flux cost per hit. Hits blocked within the first 0.15 seconds reflect 200% damage and skip the ward's next cooldown. Later blocks reflect 25%. Generates 900 hard flux per second, and has a two-second cooldown between activations.",,,,,
+arondight_ward_bulwark,SHIP_SYSTEM,"Instantly raises a barrier that while active blocks all damage with no flux cost per hit. 50% of any blocked damage returns to the attacker as an EMP arc, 20% of blocked damage repairs your hull, and 5% repairs your armor. Your top speed decreases to 10% while active. Generates 900 hard flux per second, and has a two-second cooldown between activations.",,,,,
+arondight_base_arm,WEAPON,A plain kinetic autocannon the lattice grew from its own stores when asked for a weapon.,,,,,
+arondight_durendal_arm,WEAPON,A forearm ram carrying a short-throw concussive emitter.,,,,,
+arondight_hauteclere_arm,WEAPON,"The bastion gauntlet lightened and edged. It trades throw weight for cycle time, on the theory that the pilot will not miss twice.",,,,,
+arondight_joyeuse_arm,WEAPON,A gauntlet fused into a tower-shield slab; the emitter fires through the shield face.,,,,,
+arondight_longinus_arm,WEAPON,A precision kinetic rifle grown around a lattice waveguide. Its rounds hold their line far past any rated engagement envelope.,,,,,
+arondight_gaebolg_arm,WEAPON,"A heavy launcher-lance. Each firing expends the whole weapon, and the lattice grows the next round in place.",,,,,
+arondight_rhongomyniad_arm,WEAPON,A beam lance the frame is designed around. Output climbs the longer it has a consistent target.,,,,,
+arondight_curtana_arm,WEAPON,"A blade-format beam that barely scratches a hull. Instead, it speeds up time for the target, making the rest of the world flash by.",,,,,
+arondight_clarent_arm,WEAPON,"A shorter, hungrier weave of the mercy edge. While its target is frozen, the frame vents heat down the blade's thread and pulls material back up it.",,,,,
+arondight_fragarach_arm,WEAPON,"A bladeless hilt that casts the freeze outward as a pulse: hostiles are slowed, friendlies are accelerated.",,,,,
+arondight_sealed_cover,WEAPON,A grown-shut housing where a missile cell should be. The lattice keeps it sealed until the weave unseals it.,,,,,

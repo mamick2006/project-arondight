@@ -1,0 +1,22 @@
+{
+    "displayName": "Standard",
+    "variantId": "arondight_hauteclere_Standard",
+    "hullId": "arondight_hauteclere",
+    "goalVariant": true,
+    "fluxCapacitors": 5,
+    "fluxVents": 10,
+    "hullMods": [],
+    "permaMods": [],
+    "sMods": [],
+    "weaponGroups": [
+        {
+            "autofire": false,
+            "mode": "LINKED",
+            "weapons": {
+                "WS_ARM_R": "arondight_hauteclere_arm"
+            }
+        }
+    ],
+    "wings": [],
+    "modules": []
+}

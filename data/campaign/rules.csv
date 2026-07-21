@@ -1,0 +1,77 @@
+id,trigger,conditions,script,text,options,notes
+arondightHabWardens,OpenInteractionDialog,"$arondight_habitat
+!$global.arondight_wardensDefeated","ShowDefaultVisual","Your comm board lights with a burst of machine traffic that repeats at exact intervals. It's a docking denial in Domain format, centuries out of code, and the warden drones are already turning your way.","arondightHabLeave:Break off",
+arondightHabDockFirst,OpenInteractionDialog,"$arondight_habitat
+$global.arondight_wardensDefeated
+!$global.arondight_logsRead
+!$global.arondight_m1Done","ShowDefaultVisual","Broceliande Station silently accepts your docking request. Inside, your lamps find what probably at some point used to be corridors. The deck plating has been drawn out and re-laid in overlapping courses, like wickerwork, and the walls meet the floor at eighty-five degrees.
+
+There are no bodies, no scorch marks. The crew spaces are simply absent, worked back into material, and the material worked into an idea of a load-bearing wall.
+
+A duty terminal near the airlock glows.","arondightHabLog1:Pull the duty log
+arondightHabGantry:Head for the gantry bay
+arondightHabLeave:Return to your ship",
+arondightHabDockReturn,OpenInteractionDialog,"$arondight_habitat
+$global.arondight_wardensDefeated
+$global.arondight_logsRead
+!$global.arondight_m1Done","ShowDefaultVisual","The station accepts your docking request the same way it did before. The route to the gantry bay stays lit for you now, as a courtesy.","arondightHabGantry:Head for the gantry bay
+arondightHabLeave:Return to your ship",
+arondightHabDockDone,OpenInteractionDialog,"$arondight_habitat
+$global.arondight_m1Done","ShowDefaultVisual","Broceliande Station sits quiet on your scopes. The proving course behind the bay doors stays dark, and the docking channel carries no denial and no welcome. Whatever the station spent those years finishing, it considers the work delivered.","arondightHabLeave:Leave",
+arondightHabLog1,DialogOptionSelected,"$option == arondightHabLog1",,"ACCESS GRANTED // WATCH LOG, FABRICATION LEVEL // CLEARANCE: GALENA
+
+Entry, cycle 197.4.11. Test article exceeded its growth envelope during third shift. Fabrication watch requested a cold stop of the matrix. Denied at director level. Citation: acquisition timetable.
+
+Entry, appended, watch officer: the envelope is a number we made up. Personally, I recommend somebody makes up a bigger one.","arondightHabLog2:Read the last entry
+arondightHabLeave:Return to your ship",
+arondightHabLog2,DialogOptionSelected,"$option == arondightHabLog2","$global.arondight_logsRead = true","FINAL ENTRY // UNSIGNED
+
+The weave took the reactor deck during the night watch. Output is up, even though nobody ordered that. Chandra maintains the lattice is working through a maintenance backlog.
+
+We are calling the interior work the Loom. Osei read too much Old Earth romance and it stuck.
+
+I have re-tasked the wardens to my own authority. If this reaches the Director: keep the wardens paid, and keep the door shut. It is not finished with the shape of this place. I'm not even sure we should stop it. It's not like we have any other ideas to stop what's coming. The Domain is already gone.
+
+If someone finds this in the future, take whatever it's made. Protect us, protect humanity from the coming Threat.","arondightHabGantry:Head for the gantry bay
+arondightHabLeave:Return to your ship",
+arondightHabGantry,DialogOptionSelected,"$option == arondightHabGantry",,"The power is still on in the gantry bay. In the cradle hangs a frame, shaped like a man and about the size of a frigate. Matte-gray, like clay ready to be formed. There is no dust on it, even though every other surface in the bay is covered.
+
+When your lamp crosses the cockpit, the cradle looks back. Rings of running lights wake up in the dark beyond the bay doors, one after another, going green. A proving course. You feel like it's asking you to prove you can do what is necessary.","arondightHabBoard:Board the frame
+arondightHabLeave:Back away",
+arondightHabBoard,DialogOptionSelected,"$option == arondightHabBoard","ArondightCMD startProving",,,
+arondightHabLeave,DialogOptionSelected,"$option == arondightHabLeave","DismissDialog",,,
+ArondightWardensDefeated,ArondightWardensDefeated,"!$global.arondight_wardensDefeated","$global.arondight_wardensDefeated = true
+Call $global.arondight_loom_ref updateStage","The last warden falls apart still broadcasting its denial. The burst repeats twice more from somewhere in the wreckage, then the channel closes.",,
+arondightRelayFirst,OpenInteractionDialog,"$arondight_relay
+!$global.arondight_relayScanned","ShowDefaultVisual","The relay is Domain hardware on a dead orbit, forty years past its last service flag. Its buffer holds decades of nothing and, from twenty days ago, fragments of a distress record.
+
+//BUFFER 4 OF 7// ...read it like a survey return, but the mass is wrong, the mass must be wrong...
+
+//BUFFER 5 OF 7// ...took the drive section whole. Not a shot fired at the crew spaces. It is not interested in...
+
+//BUFFER 7 OF 7// ...course change again. Toward the deep field. It knows where it is going.
+
+You don't know if this was the Threat the Broceliande Station's records spoke of.","arondightRelayCopy:Copy the record and assemble the bearing
+arondightLeave:Leave",
+arondightRelayCopy,DialogOptionSelected,"$option == arondightRelayCopy","$global.arondight_relayScanned = true
+Call $global.arondight_rec_ref updateStage","The fragments knit into a course under your nav officer's hands.
+
+Before the plot settles, your sensors board cuts in. There are new contacts, machine-pattern, inbound, not answering hails, and not matching the record's mass profile either. Much smaller.","arondightLeave:Return to your ship",
+arondightRelayAgain,OpenInteractionDialog,"$arondight_relay
+$global.arondight_relayScanned","ShowDefaultVisual","The relay's buffer is already yours. The channel it kept open all those years holds nothing else.","arondightLeave:Leave",
+ArondightEscortDefeated,ArondightEscortDefeated,"!$global.arondight_escortDefeated","$global.arondight_escortDefeated = true
+Call $global.arondight_rec_ref updateStage","The last of the escort breaks up still in formation. No distress call went out. Nothing out here was listening for one anyway.",,
+arondightStagingEarly,OpenInteractionDialog,"$arondight_staging
+!$global.arondight_escortDefeated","ShowDefaultVisual","The anchorage is cold at this range, and nothing here answers your instruments. Whatever course the relay recorded, it ends here. You are ahead of it.","arondightLeave:Leave",
+arondightStaging,OpenInteractionDialog,"$arondight_staging
+$global.arondight_escortDefeated
+!$global.arondight_m2Done","ShowDefaultVisual","The anchorage is unnamed Domain work: a construction spine and a cold reactor mast, parked in the dark past the last surveyed orbit. Somebody meant to build here once, before the Domain fell.
+
+Against the spine, something is waiting. It shifts, rotating, in the gloom. It is not a hull so much as an agreement between parts, and it is pointed at you. A fragment of a touch of the Threat the Persean Sector might soon face.
+
+In your own hangar, the lattice comes up to full activity for the first time. Every screen shows the mass on the spine.","arondightBeginDuel:Begin the approach
+arondightLeave:Withdraw for now",
+arondightBeginDuel,DialogOptionSelected,"$option == arondightBeginDuel","ArondightCMD startDuel",,,
+arondightStagingDone,OpenInteractionDialog,"$arondight_staging
+$global.arondight_m2Done","ShowDefaultVisual","The anchorage spine drifts empty. What was parked against it is gone, with nothing left behind.","arondightLeave:Leave",
+arondightLeave,DialogOptionSelected,"$option == arondightLeave","DismissDialog",,,

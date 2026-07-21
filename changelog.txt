@@ -1,0 +1,4 @@
+v1.0.0
+Can be added to existing saves.
+
+- Initial release.

@@ -1,0 +1,6 @@
+name,id,flux/second,f/s (base rate),f/s (base cap),flux/use,f/u (base rate),f/u (base cap),cr/u,max uses,regen,charge up,active,down,cooldown,toggle,noDissipation,noHardDissipation,hardFlux,noFiring,noTurning,noStrafing,noAccel,noShield,noVent,isPhaseCloak,tags,icon
+Lattice Shift,arondight_shift,,,,,,,,2,0.1,0.2,,0.2,0,,TRUE,,TRUE,,,,,,,,"movement, hide_in_codex",graphics/icons/hullsys/displacer.png
+Spotter Lattice,arondight_spotter,,,,,,0.2,,,,0.5,10,1,10,,,,,,,,,,,,"offensive, hide_in_codex",graphics/icons/hullsys/entropy_amplifier.png
+Ward,arondight_ward,,,,,,,,,,0,,0.15,2,TRUE,,TRUE,TRUE,,,,,,TRUE,,"defensive, hide_in_codex",graphics/icons/hullsys/damper_field.png
+Ward Flash,arondight_ward_flash,,,,,,,,,,0,0.5,0.1,2,,,TRUE,TRUE,,,,,,TRUE,,"defensive, hide_in_codex",graphics/icons/hullsys/damper_field.png
+Ward Bulwark,arondight_ward_bulwark,,,,,,,,,,0,,0.2,2,TRUE,,TRUE,TRUE,,,,,,TRUE,,"defensive, hide_in_codex",graphics/icons/hullsys/fortress_shield.png

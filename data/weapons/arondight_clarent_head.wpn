@@ -1,0 +1,15 @@
+{
+	"id":"arondight_clarent_head",
+	"specClass":"projectile",
+	"type":"DECORATIVE",
+	"size":"SMALL",
+	"turretSprite":"graphics/arondight/ships/parts/arondight_clarent_head.png",
+	"hardpointSprite":"graphics/arondight/ships/parts/arondight_clarent_head.png",
+	"turretOffsets":[0, 0],
+	"turretAngleOffsets":[0],
+	"hardpointOffsets":[0, 0],
+	"hardpointAngleOffsets":[0],
+	"barrelMode":"LINKED",
+	"animationType":"NONE",
+	"projectileSpecId":"arondight_pulse_dud",
+}

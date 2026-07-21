@@ -1,0 +1,24 @@
+{
+	# the spiral rope's rocket at ~2x footprint, ballistic
+	# and lattice-green; constant speed makes the ropes perfect Archimedean
+	# spirals (the classic annihilator accelerates, bending them near spawn)
+	"id":"arondight_spiral_bolt",
+	"specClass":"projectile",
+	"spawnType":"BALLISTIC",
+	"collisionClass":"PROJECTILE_FF",
+	"collisionClassByFighter":"PROJECTILE_FIGHTER",
+	"length":40.0,
+	"hitGlowRadius":60,
+	"width":15.0,
+	"fadeTime":0.4,
+	"fringeColor":[140,255,190,190],
+	"coreColor":[235,255,245,230],
+	"glowColor":[140,255,190,110],
+	"glowRadius":50,
+	"textureScrollSpeed":64.0,
+	"pixelsPerTexel":5.0,
+	"passThroughMissiles":true,
+	"passThroughFighters":true,
+	"passThroughFightersOnlyWhenDestroyed":true,
+	"bulletSprite":"graphics/missiles/shell_hellbore.png"
+}

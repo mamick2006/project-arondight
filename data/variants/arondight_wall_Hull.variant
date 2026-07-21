@@ -1,0 +1,12 @@
+{
+  "displayName": "Hull",
+  "variantId": "arondight_wall_Hull",
+  "hullId": "arondight_wall",
+  "goalVariant": false,
+  "fluxCapacitors": 0,
+  "fluxVents": 0,
+  "hullMods": [],
+  "permaMods": [],
+  "sMods": [],
+  "weaponGroups": []
+}

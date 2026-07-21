@@ -1,0 +1,18 @@
+{
+	"id":"arondight_longinus_arm",
+	"specClass":"projectile",
+	"type":"BALLISTIC",
+	"size":"SMALL",
+	"turretSprite":"graphics/arondight/ships/parts/arondight_longinus_arm_r.png",
+	"hardpointSprite":"graphics/arondight/ships/parts/arondight_longinus_arm_r.png",
+	"turretOffsets":[34, 0],
+	"turretAngleOffsets":[0],
+	"hardpointOffsets":[34, 0],
+	"hardpointAngleOffsets":[0],
+	"barrelMode":"LINKED",
+	"animationType":"NONE",
+	"renderHints":[RENDER_BARREL_BELOW],
+	"projectileSpecId":"arondight_bolt",
+	"fireSoundTwo":"gauss_cannon_fire",
+	"autocharge":true,
+}

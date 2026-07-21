@@ -1,0 +1,77 @@
+name,id,tier,rarity,base value,range,damage/second,damage/shot,emp,impact,turn rate,OPs,ammo,ammo/sec,reload size,type,energy/shot,energy/second,chargeup,chargedown,burst size,burst delay,min spread,max spread,spread/shot,spread decay/sec,beam speed,proj speed,launch speed,flight time,proj hitpoints,autofireAccBonus,extraArcForAI,hints,tags,groupTag,tech/manufacturer,for weapon tooltip>>,primaryRoleStr,speedStr,trackingStr,turnRateStr,accuracyStr,customPrimary,customPrimaryHL,customAncillary,customAncillaryHL,noDPSInTooltip,number
+Fabricated Autocannon,arondight_base_arm,,,100,600,,50,,10,25,0,,,,KINETIC,25,,0,0.5,1,,0,3,2,10,,900,,,,,,SYSTEM,arondight,,Special Acquisitions,,Assault,,,,,,,,,,
+Bastion Gauntlet,arondight_durendal_arm,,,100,450,,400,,60,15,0,,,,HIGH_EXPLOSIVE,250,,0,3.8,1,,0,2,0,10,,1000,,,,,,SYSTEM,arondight,,Special Acquisitions,,Assault,,,,,,,,,,
+Swift Gauntlet,arondight_hauteclere_arm,,,100,450,,150,,25,30,0,,,,HIGH_EXPLOSIVE,90,,0,1,1,,0,4,2,12,,800,,,,,,SYSTEM,arondight,,Special Acquisitions,,Assault,,,,,,,,,,
+Warden Gauntlet,arondight_joyeuse_arm,,,100,500,,250,,40,15,0,,,,HIGH_EXPLOSIVE,150,,0.2,2.2,1,,0,3,1,10,,700,,,,,,SYSTEM,arondight,,Special Acquisitions,,Assault,,,,,,,,,,
+Lance Rifle,arondight_longinus_arm,,,100,1400,,350,,80,10,0,,,,KINETIC,200,,0.6,3,1,,0,0,0,10,,3500,,,,,,SYSTEM,arondight,,Special Acquisitions,,Strike,,,,,,,,,,
+Gae Bolg,arondight_gaebolg_arm,,,100,900,,500,,100,12,0,,,,HIGH_EXPLOSIVE,300,,0.4,4,1,,0,1,0,10,,1200,,,,,,SYSTEM,arondight,,Special Acquisitions,,Strike,,,,,,,,,,
+Mercy Edge,arondight_curtana_arm,,,100,700,10,,,,25,0,,,,ENERGY,,60,0.1,0.2,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,Special,,,,,,,,,,
+Thief's Edge,arondight_clarent_arm,,,100,700,15,,,,25,0,,,,ENERGY,,80,0.1,0.2,5,3,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,Special,,,,,,,,,,
+Rhongomyniad,arondight_rhongomyniad_arm,,,100,750,150,,,,8,0,,,,ENERGY,,220,0.5,0.5,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,Strike,,,,,,,,,,
+The Answerer,arondight_fragarach_arm,,,100,500,,1,,,20,0,,,,ENERGY,400,,0.3,8,1,,0,0,0,10,,600,,,,,,SYSTEM,arondight,,Special Acquisitions,,Special,,,,,,,,,,TRUE
+Sealed Cover,arondight_sealed_cover,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Base Head,arondight_base_head,,,,1,1,,,,75,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Base Pauldron L,arondight_base_pauldron_l,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Base Pauldron R,arondight_base_pauldron_r,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Base Legs,arondight_base_legs,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Curtana Head,arondight_curtana_head,,,,1,1,,,,75,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Curtana Pauldron L,arondight_curtana_pauldron_l,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Curtana Pauldron R,arondight_curtana_pauldron_r,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Curtana Legs,arondight_curtana_legs,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Durendal Head,arondight_durendal_head,,,,1,1,,,,75,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Durendal Pauldron L,arondight_durendal_pauldron_l,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Durendal Pauldron R,arondight_durendal_pauldron_r,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Durendal Legs,arondight_durendal_legs,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Gaebolg Head,arondight_gaebolg_head,,,,1,1,,,,75,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Gaebolg Pauldron L,arondight_gaebolg_pauldron_l,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Gaebolg Pauldron R,arondight_gaebolg_pauldron_r,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Gaebolg Legs,arondight_gaebolg_legs,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Longinus Head,arondight_longinus_head,,,,1,1,,,,75,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Longinus Pauldron L,arondight_longinus_pauldron_l,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Longinus Pauldron R,arondight_longinus_pauldron_r,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Longinus Legs,arondight_longinus_legs,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Joyeuse Head,arondight_joyeuse_head,,,,1,1,,,,75,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Joyeuse Pauldron L,arondight_joyeuse_pauldron_l,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Joyeuse Pauldron R,arondight_joyeuse_pauldron_r,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Joyeuse Legs,arondight_joyeuse_legs,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Clarent Head,arondight_clarent_head,,,,1,1,,,,75,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Clarent Pauldron L,arondight_clarent_pauldron_l,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Clarent Pauldron R,arondight_clarent_pauldron_r,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Clarent Legs,arondight_clarent_legs,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Fragarach Head,arondight_fragarach_head,,,,1,1,,,,75,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Fragarach Pauldron L,arondight_fragarach_pauldron_l,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Fragarach Pauldron R,arondight_fragarach_pauldron_r,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Fragarach Legs,arondight_fragarach_legs,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Rhongomyniad Head,arondight_rhongomyniad_head,,,,1,1,,,,75,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Rhongomyniad Pauldron L,arondight_rhongomyniad_pauldron_l,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Rhongomyniad Pauldron R,arondight_rhongomyniad_pauldron_r,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Rhongomyniad Legs,arondight_rhongomyniad_legs,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Hauteclere Head,arondight_hauteclere_head,,,,1,1,,,,75,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Hauteclere Pauldron L,arondight_hauteclere_pauldron_l,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Hauteclere Pauldron R,arondight_hauteclere_pauldron_r,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Hauteclere Legs,arondight_hauteclere_legs,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Base Hardcase Arm,arondight_base_arm_l,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Clarent Hardcase Arm,arondight_clarent_arm_l,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Curtana Hardcase Arm,arondight_curtana_arm_l,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Durendal Hardcase Arm,arondight_durendal_arm_l,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Fragarach Hardcase Arm,arondight_fragarach_arm_l,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Gaebolg Hardcase Arm,arondight_gaebolg_arm_l,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Hauteclere Hardcase Arm,arondight_hauteclere_arm_l,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Joyeuse Hardcase Arm,arondight_joyeuse_arm_l,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Longinus Hardcase Arm,arondight_longinus_arm_l,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Rhongomyniad Hardcase Arm,arondight_rhongomyniad_arm_l,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Clarent Aux X1,arondight_clarent_x1,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Fragarach Aux X1,arondight_fragarach_x1,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Gaebolg Aux X1,arondight_gaebolg_x1,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Hauteclere Aux X1,arondight_hauteclere_x1,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Hauteclere Aux X2,arondight_hauteclere_x2,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Joyeuse Aux X1,arondight_joyeuse_x1,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Rhongomyniad Aux X1,arondight_rhongomyniad_x1,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Curtana Aux X1,arondight_curtana_x1,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Curtana Aux X2,arondight_curtana_x2,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Durendal Aux X1,arondight_durendal_x1,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Longinus Aux X1,arondight_longinus_x1,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
+Lattice Rod,arondight_wall_rod,,,100,2750,,1500,,120,,0,,,,HIGH_EXPLOSIVE,0,,0,2.5,1,,0,0,0,10,,500,,,,,,SYSTEM,arondight,,Special Acquisitions,,Assault,,,,,,,,,,
+Lattice Mass,arondight_wall_ball,,,100,2750,,1500,,120,,0,,,,HIGH_EXPLOSIVE,0,,0,2.5,1,,0,0,0,10,,500,,,,,,SYSTEM,arondight,,Special Acquisitions,,Assault,,,,,,,,,,
+Lattice Mote,arondight_spiral_bolt,,,100,2400,,200,,30,,0,,,,HIGH_EXPLOSIVE,0,,0,0.1,1,,0,0,0,10,,400,,,,,,SYSTEM,arondight,,Special Acquisitions,,Assault,,,,,,,,,,
+Lattice Lance,arondight_aimed_lance,,,100,5400,,700,,120,,0,,,,KINETIC,0,,0,0.9,1,,0,0,0,10,,700,,,,,,SYSTEM,arondight,,Special Acquisitions,,Assault,,,,,,,,,,

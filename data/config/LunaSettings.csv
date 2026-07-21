@@ -1,0 +1,6 @@
+fieldID,fieldName,fieldType,defaultValue,secondaryValue,fieldDescription,minValue,maxValue,tab
+arondight_headerSp,Story points,Header,Story points,,,,,
+arondight_node_sp_cost,Weave node cost (SP),Int,1,,Story points to weave one node.,0,10,
+arondight_tier1_sp_cost,Tier-1 form cost (SP),Int,2,,"Story points to transform into a tier-1 form.",0,10,
+arondight_tier2_sp_cost,Tier-2 form cost (SP),Int,3,,Story points to transform into a tier-2 form. Available once the Reclaimer is destroyed.,0,10,
+arondight_respec_sp_cost,Respec cost (SP),Int,1,,"Story points to respec (refunding node and form points), at 100%% bonus XP.",0,10,

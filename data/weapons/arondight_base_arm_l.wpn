@@ -1,0 +1,15 @@
+{
+	"id":"arondight_base_arm_l",
+	"specClass":"projectile",
+	"type":"DECORATIVE",
+	"size":"SMALL",
+	"turretSprite":"graphics/arondight/ships/parts/arondight_base_arm_l.png",
+	"hardpointSprite":"graphics/arondight/ships/parts/arondight_base_arm_l.png",
+	"turretOffsets":[0, 0],
+	"turretAngleOffsets":[0],
+	"hardpointOffsets":[0, 0],
+	"hardpointAngleOffsets":[0],
+	"barrelMode":"LINKED",
+	"animationType":"NONE",
+	"projectileSpecId":"arondight_pulse_dud",
+}

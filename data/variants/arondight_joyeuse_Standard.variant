@@ -1,0 +1,22 @@
+{
+    "displayName": "Standard",
+    "variantId": "arondight_joyeuse_Standard",
+    "hullId": "arondight_joyeuse",
+    "goalVariant": true,
+    "fluxCapacitors": 5,
+    "fluxVents": 10,
+    "hullMods": [],
+    "permaMods": [],
+    "sMods": [],
+    "weaponGroups": [
+        {
+            "autofire": false,
+            "mode": "LINKED",
+            "weapons": {
+                "WS_ARM_R": "arondight_joyeuse_arm"
+            }
+        }
+    ],
+    "wings": [],
+    "modules": []
+}

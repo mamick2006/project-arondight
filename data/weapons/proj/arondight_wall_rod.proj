@@ -1,0 +1,20 @@
+{
+	# the lattice
+	# wall as BARS - one rod's length carries the depth the classic style needed
+	# a second staggered layer for, so the wall costs half the entities; being
+	# ballistic, it also sheds the missile engine tick, trail, and PD bracket
+	"id":"arondight_wall_rod",
+	"specClass":"projectile",
+	"spawnType":"BALLISTIC_AS_BEAM",
+	"collisionClass":"RAY",
+	"collisionClassByFighter":"RAY_FIGHTER",
+	"length":110.0,
+	"hitGlowRadius":90,
+	"width":26.0,
+	"fadeTime":0.4,
+	"fringeColor":[255,140,60,220],
+	"coreColor":[255,240,210,255],
+	"textureScrollSpeed":64.0,
+	"pixelsPerTexel":5.0,
+	"bulletSprite":"graphics/missiles/shell_gauss_cannon.png"
+}

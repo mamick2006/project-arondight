@@ -1,0 +1,15 @@
+{
+	"id":"arondight_sealed_cover",
+	"specClass":"projectile",
+	"type":"DECORATIVE",
+	"size":"SMALL",
+	"turretSprite":"graphics/arondight/weapons/arondight_blank.png",
+	"hardpointSprite":"graphics/arondight/weapons/arondight_blank.png",
+	"turretOffsets":[0, 0],
+	"turretAngleOffsets":[0],
+	"hardpointOffsets":[0, 0],
+	"hardpointAngleOffsets":[0],
+	"barrelMode":"LINKED",
+	"animationType":"NONE",
+	"projectileSpecId":"arondight_pulse_dud",
+}

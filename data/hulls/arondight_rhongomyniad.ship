@@ -1,0 +1,207 @@
+{
+  "hullName": "Arondight RHO",
+  "hullId": "arondight_rhongomyniad",
+  "hullSize": "FRIGATE",
+  "spriteName": "graphics/arondight/ships/arondight_rhongomyniad.png",
+  "style": "HIGH_TECH",
+  "height": 28,
+  "width": 48,
+  "center": [
+    23.5,
+    14
+  ],
+  "collisionRadius": 44,
+  "shieldCenter": [
+    6,
+    0
+  ],
+  "shieldRadius": 36,
+  "viewOffset": 0,
+  "builtInMods": [
+    "arondight_lattice",
+    "arondight_form_rhongomyniad",
+    "delicate"
+  ],
+  "builtInWeapons": {
+    "WS_ARM_R": "arondight_rhongomyniad_arm",
+    "WS_DECO_ARM_L": "arondight_rhongomyniad_arm_l",
+    "WS_SH_L": "arondight_sealed_cover",
+    "WS_SH_R": "arondight_sealed_cover",
+    "WS_DECO_HEAD": "arondight_rhongomyniad_head",
+    "WS_DECO_PL": "arondight_rhongomyniad_pauldron_l",
+    "WS_DECO_PR": "arondight_rhongomyniad_pauldron_r",
+    "WS_DECO_X1": "arondight_rhongomyniad_x1"
+  },
+  "weaponSlots": [
+    {
+      "id": "WS_ARM_R",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 60,
+      "angle": -14,
+      "locations": [
+        2,
+        -12
+      ]
+    },
+    {
+      "id": "WS_ARM_L",
+      "size": "MEDIUM",
+      "type": "UNIVERSAL",
+      "mount": "HIDDEN",
+      "arc": 90,
+      "angle": 0,
+      "locations": [
+        8,
+        13
+      ]
+    },
+    {
+      "id": "WS_DECO_ARM_L",
+      "size": "SMALL",
+      "type": "DECORATIVE",
+      "mount": "TURRET",
+      "arc": 0,
+      "angle": 16,
+      "locations": [
+        4,
+        13
+      ]
+    },
+    {
+      "id": "WS_SH_L",
+      "size": "SMALL",
+      "type": "DECORATIVE",
+      "mount": "HIDDEN",
+      "arc": 90,
+      "angle": 0,
+      "locations": [
+        7,
+        20
+      ]
+    },
+    {
+      "id": "WS_SH_R",
+      "size": "SMALL",
+      "type": "DECORATIVE",
+      "mount": "HIDDEN",
+      "arc": 90,
+      "angle": 0,
+      "locations": [
+        7,
+        -20
+      ]
+    },
+    {
+      "id": "WS_DECO_PL",
+      "size": "SMALL",
+      "type": "DECORATIVE",
+      "mount": "TURRET",
+      "arc": 0,
+      "angle": -20,
+      "locations": [
+        7,
+        20
+      ],
+      "renderOrderMod": 10
+    },
+    {
+      "id": "WS_DECO_PR",
+      "size": "SMALL",
+      "type": "DECORATIVE",
+      "mount": "TURRET",
+      "arc": 0,
+      "angle": 20,
+      "locations": [
+        7,
+        -20
+      ],
+      "renderOrderMod": 10
+    },
+    {
+      "id": "WS_DECO_HEAD",
+      "size": "SMALL",
+      "type": "DECORATIVE",
+      "mount": "TURRET",
+      "arc": 135,
+      "angle": 0,
+      "locations": [
+        10,
+        0
+      ],
+      "renderOrderMod": 20
+    },
+    {
+      "id": "WS_DECO_X1",
+      "size": "SMALL",
+      "type": "DECORATIVE",
+      "mount": "TURRET",
+      "arc": 0,
+      "angle": 0,
+      "locations": [
+        -8,
+        0
+      ],
+      "renderOrderMod": 5
+    }
+  ],
+  "engineSlots": [
+    {
+      "location": [
+        -8,
+        5.5
+      ],
+      "length": 14,
+      "width": 5,
+      "angle": 180,
+      "contrailSize": 24,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [
+        -8,
+        -5.5
+      ],
+      "length": 14,
+      "width": 5,
+      "angle": 180,
+      "contrailSize": 24,
+      "style": "HIGH_TECH"
+    }
+  ],
+  "bounds": [
+    13,
+    3,
+    9.8,
+    10,
+    5.2,
+    17,
+    1.6,
+    23,
+    -3,
+    23,
+    -6.3,
+    16,
+    -9.8,
+    9,
+    -14,
+    4,
+    -14,
+    -4,
+    -9.8,
+    -9,
+    -6.3,
+    -16,
+    -3,
+    -23,
+    1.6,
+    -23,
+    5.2,
+    -17,
+    9.8,
+    -10,
+    13,
+    -3
+  ]
+}

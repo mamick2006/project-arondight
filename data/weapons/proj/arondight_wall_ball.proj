@@ -1,0 +1,23 @@
+{
+	# the wall shot at ~2x the hammer's visual footprint, ballistic
+	# (no missile engine tick, trail, or PD bracket per entity)
+	"id":"arondight_wall_ball",
+	"specClass":"projectile",
+	"spawnType":"BALLISTIC",
+	"collisionClass":"PROJECTILE_FF",
+	"collisionClassByFighter":"PROJECTILE_FIGHTER",
+	"length":70.0,
+	"hitGlowRadius":110,
+	"width":22.0,
+	"fadeTime":0.5,
+	"fringeColor":[255,150,60,190],
+	"coreColor":[255,245,220,230],
+	"glowColor":[255,150,60,120],
+	"glowRadius":80,
+	"textureScrollSpeed":64.0,
+	"pixelsPerTexel":5.0,
+	"passThroughMissiles":true,
+	"passThroughFighters":true,
+	"passThroughFightersOnlyWhenDestroyed":true,
+	"bulletSprite":"graphics/missiles/shell_hellbore.png"
+}

@@ -1,0 +1,23 @@
+{
+	"id":"arondight_ward_flash",
+	"type":"PHASE_CLOAK",
+	"aiType":"PHASE_CLOAK",
+
+	"statsScript":"arondight.form.mechanics.WardFlashSystemScript",
+
+	"canNotCauseOverload":false,
+
+	"jitterUnderColor":[215,240,255,200],
+	"jitterUnderCopies":24,
+	"jitterUnderMinRange":0,
+	"jitterUnderRange":10,
+	"jitterUnderRangeRadiusFraction":0,
+
+	"fadeActivationSoundOnChargedown":true,
+	"useSound":"system_damper",
+	"deactivateSound":"system_damper_off",
+	"outOfUsesSound":"gun_out_of_ammo",
+
+	"aiHints":{
+	}
+}

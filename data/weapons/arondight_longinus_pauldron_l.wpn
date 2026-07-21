@@ -1,0 +1,15 @@
+{
+	"id":"arondight_longinus_pauldron_l",
+	"specClass":"projectile",
+	"type":"DECORATIVE",
+	"size":"SMALL",
+	"turretSprite":"graphics/arondight/ships/parts/arondight_longinus_pauldron_l.png",
+	"hardpointSprite":"graphics/arondight/ships/parts/arondight_longinus_pauldron_l.png",
+	"turretOffsets":[0, 0],
+	"turretAngleOffsets":[0],
+	"hardpointOffsets":[0, 0],
+	"hardpointAngleOffsets":[0],
+	"barrelMode":"LINKED",
+	"animationType":"NONE",
+	"projectileSpecId":"arondight_pulse_dud",
+}

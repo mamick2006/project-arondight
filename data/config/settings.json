@@ -1,0 +1,195 @@
+{
+    # Project Arondight tunables. Every balance number the mod reads lives here
+    # under an arondight_ key.
+
+    # Rules-command resolution (REQUIRED for rules.csv actions)
+    "ruleCommandPackages":["arondight.campaign.rulecmd"],
+
+	"graphics": {
+		# UI icon registry: the 23 weave node icons + 4 cluster motifs the
+		# weave pane reads (category "arondight_nodes", keyed by node id / cluster key)
+		# and the intel entry's icon ("icons"/"arondight_intel"). The UI degrades to
+		# text rows / the vanilla fleet-log glyph while any key is missing.
+		"icons": {
+			"arondight_intel": "graphics/arondight/icons/arondight_intel.png"
+		},
+		# Quest illustrations; served 480x300 via ShowImageVisual / showImagePortion
+		"illustrations": {
+			"arondight_station_broceliande": "graphics/arondight/illustrations/station_broceliande.jpg",
+			"arondight_dead_relay": "graphics/arondight/illustrations/dead_relay.jpg",
+			"arondight_deep_anchorage": "graphics/arondight/illustrations/deep_anchorage.jpg",
+			"arondight_beacon_signal": "graphics/arondight/illustrations/beacon_signal.jpg"
+		},
+		"arondight_nodes": {
+			"root": "graphics/arondight/icons/node_root.png",
+			"reinforced_weave": "graphics/arondight/icons/node_reinforced_weave.png",
+			"dense_plating": "graphics/arondight/icons/node_dense_plating.png",
+			"reactor_bloom": "graphics/arondight/icons/node_reactor_bloom.png",
+			"vent_lattice": "graphics/arondight/icons/node_vent_lattice.png",
+			"drive_resonance": "graphics/arondight/icons/node_drive_resonance.png",
+			"neural_mesh": "graphics/arondight/icons/node_neural_mesh.png",
+			"shoulder_left": "graphics/arondight/icons/node_shoulder_left.png",
+			"shoulder_right": "graphics/arondight/icons/node_shoulder_right.png",
+			"expanded_lattice_1": "graphics/arondight/icons/node_expanded_lattice_1.png",
+			"expanded_lattice_2": "graphics/arondight/icons/node_expanded_lattice_2.png",
+			"munitions_loom": "graphics/arondight/icons/node_munitions_loom.png",
+			"arm_actuators": "graphics/arondight/icons/node_arm_actuators.png",
+			"charge_cell": "graphics/arondight/icons/node_charge_cell.png",
+			"quick_cycle": "graphics/arondight/icons/node_quick_cycle.png",
+			"zero_point_idle": "graphics/arondight/icons/node_zero_point_idle.png",
+			"watchdog_remotes": "graphics/arondight/icons/node_watchdog_remotes.png",
+			"self_weave": "graphics/arondight/icons/node_self_weave.png",
+			"afterimage": "graphics/arondight/icons/node_afterimage.png",
+			"static_bleed": "graphics/arondight/icons/node_static_bleed.png",
+			"harvest_reflex": "graphics/arondight/icons/node_harvest_reflex.png",
+			"loom_salvage": "graphics/arondight/icons/node_loom_salvage.png",
+			"lattice_sight": "graphics/arondight/icons/node_lattice_sight.png",
+			"kinetic_buffer": "graphics/arondight/icons/node_kinetic_buffer.png",
+			"cluster_frame": "graphics/arondight/icons/cluster_frame.png",
+			"cluster_hardpoint": "graphics/arondight/icons/cluster_hardpoint.png",
+			"cluster_system": "graphics/arondight/icons/cluster_system.png",
+			"cluster_lattice": "graphics/arondight/icons/cluster_lattice.png"
+		}
+	},
+
+    # SP economy: node/tier-2 spends give no bonus XP; respec's own point
+    # stays spent at 100% bonus XP and the node SP comes back as REAL
+    # points from the state ledger
+    "arondight_node_sp_cost": 1,
+    "arondight_node_bonus_xp": 0.0,
+    "arondight_respec_sp_cost": 1,
+    "arondight_respec_bonus_xp": 1.0,
+    # Form cost model (forms price like weave nodes): selecting a form transforms
+    # immediately and charges its tier cost EVERY time - no paid-form memory;
+    # the Reclaimer still gates tier-2; respec refunds the era's actual charges
+    "arondight_tier1_sp_cost": 2,
+    "arondight_tier1_bonus_xp": 0.0,
+    "arondight_tier2_sp_cost": 3,
+    "arondight_tier2_bonus_xp": 0.0,
+
+    # The weave. No node-count cap: total SP invested (forms + weaves) is
+    # capped at the player's LEVEL, read live from the campaign stat
+    # (deliberately no settings knob for the budget).
+    # Each woven node adds +step supplies/mo and +step supplies-to-recover
+    # (recovery cost and deployment points are one CSV column); WeaveApplier
+    # recomputes the total from state on every apply, so it never compounds.
+    "arondight_weave_logistics_step": 2,
+
+    # Weave SPEC node amounts (descriptions render from these)
+    "arondight_node_hull_mult": 1.15,
+    "arondight_node_armor_flat": 80,
+    "arondight_node_fluxcap_mult": 1.15,
+    "arondight_node_fluxdiss_mult": 1.15,
+    "arondight_node_speed_mult": 1.10,
+    "arondight_node_maneuver_mult": 1.25,
+    "arondight_node_op_flat": 2,
+
+    # Stasis (Curtana line): sustained effects, no timed freezes. Curtana
+    # slows to slow_mult while its beam holds a HULL (shield hits do nothing);
+    # Clarent freezes at timemult while its burst beam holds. Both lapse
+    # ~0.1 s after the beam leaves.
+    "arondight_stasis_timemult": 0.01,
+    "arondight_curtana_slow_mult": 0.5,
+
+    # Ward family (Durendal line). Ward upkeep is NOT a key here: it lives in
+    # the hull phase-upkeep column of ship_data.csv (0.333 = 1/3 of base flux
+    # capacity per second as HARD flux; all three ward forms). The bulwark
+    # heals from blocked damage; there is no catch-and-return.
+    "arondight_ward_reflect": 0.5,
+    "arondight_ward_perfect_window": 0.15,
+    "arondight_ward_perfect_reflect": 2.0,
+    "arondight_ward_sloppy_reflect": 0.25,
+    "arondight_ward_arc_range": 1200,
+    "arondight_ward_heal_hull": 0.20,
+    "arondight_ward_heal_armor": 0.05,
+    "arondight_ward_bulwark_anchor_mult": 0.1,
+
+    # Spotter (Longinus line): the entropy-amplifier shape - the marked
+    # target takes damage_mult on all four taken-damage channels for the
+    # timed active; range gates the trigger (READY / OUT OF RANGE / NO TARGET)
+    "arondight_spotter_damage_mult": 1.5,
+    "arondight_spotter_range": 4000,
+    "arondight_longinus_range_mult": 3,
+
+    # Gae Bolg + Rhongomyniad: both double every weapon's base range
+    "arondight_double_range_mult": 2.0,
+
+    # Gae Bolg strike economy: 3x damage, double ammo per shot, the FIRED
+    # weapon locks 5 s (a kill clears all locks); unpaid ammo costs half the
+    # weapon's damage as shield-bypassing self-damage
+    "arondight_gaebolg_lock": 5,
+    "arondight_gaebolg_damage_mult": 3,
+    "arondight_gaebolg_ammo_mult": 2,
+    "arondight_gaebolg_self_damage_mult": 0.5,
+
+    # Rhongomyniad ramp + anchor
+    "arondight_ramp_time": 6,
+    "arondight_ramp_max_mult": 4,
+    "arondight_anchor_mult": 0.05,
+
+    # Clarent drain
+    "arondight_clarent_vent_mult": 2.0,
+    "arondight_clarent_cooldown_bonus": 0.5,
+    "arondight_clarent_leech": 15,
+
+    # Fragarach pulse
+    "arondight_pulse_radius": 800,
+    "arondight_pulse_duration": 4,
+    "arondight_pulse_slow_mult": 0.65,
+    "arondight_pulse_haste_mult": 1.35,
+
+    # LATTICE nodes
+    "arondight_zero_point_flux_level": 0.05,
+    "arondight_watchdog_variant": "drone_terminator",
+    "arondight_watchdog_leash": 220,
+    "arondight_watchdog_respawn": 10,
+    "arondight_selfweave_cap": 1.0,
+    "arondight_selfweave_rate": 0.005,
+    "arondight_bleed_range": 500,
+    "arondight_bleed_damage": 60,
+    "arondight_loom_ammo_per_sec": 0.04,
+    "arondight_actuators_bonus": 25,
+    "arondight_harvest_hull": 0.10,
+    "arondight_harvest_armor": 0.10,
+    "arondight_harvest_cr": 0.02,
+    "arondight_afterimage_threshold": 0.05,
+    "arondight_afterimage_cooldown": 12,
+    "arondight_afterimage_dist": 250,
+    "arondight_buffer_fraction": 0.15,
+    "arondight_salvage_bonus": 0.2,
+
+    # Missions (in-code fallbacks match these values)
+    "arondight_m2_offer_delay_days": 10,
+    # Reclamation Escort fire support: standoff_unit_Type300 hulls (18 FP
+    # each) added on top of the fixed 2 skirmish + 2 assault roster
+    "arondight_escort_standoff_units": 1,
+    # Loom labyrinth (one exit, per-battle generation, no per-gate
+    # checkpoints). The alpha bounds are the winnability/tension band the
+    # generator rerolls against; seed 0 = random per battle.
+    "arondight_loom_sweeper_speed": 80,
+    "arondight_loom_seed": 0,
+    "arondight_loom_alpha_min": 1.6,
+    "arondight_loom_alpha_max": 2.4,
+    "arondight_boss_phase2_hull": 0.65,
+    "arondight_boss_phase3_hull": 0.30,
+    "arondight_boss_regen_window_seconds": 6,
+    "arondight_boss_regen_hull_fraction": 0.35,
+    # radial = phase-I wall-volley cadence (code scales x0.88 for II and III);
+    # aimed = the single-slug stream beat (x0.78/x0.61)
+    "arondight_boss_radial_interval": 2.5,
+    "arondight_boss_fan_interval": 6,
+    "arondight_boss_swarm_interval": 5,
+    "arondight_boss_aimed_interval": 0.9,
+    # rods is the shipped default: lattice bars, one wall layer instead of
+    # two, the most wall-like read - and the cheapest (rods hold ~238
+    # entities flat where classic peaks ~496 concurrent and dips minimum
+    # fps; heavy ~300, also capped). classic|heavy remain selectable.
+    "arondight_boss_projectile_style": "rods",
+    "arondight_boss_telegraph_seconds": 1.2,
+    "arondight_boss_ring_radius": 5200,
+    "arondight_boss_ring_radius_p3": 2400,
+    "arondight_boss_damage_mult": 0.5,
+    "arondight_surge_time_mult": 2.5,
+    "arondight_surge_duration_seconds": 1.5,
+    "arondight_surge_cooldown_seconds": 5
+}

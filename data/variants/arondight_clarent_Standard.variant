@@ -1,0 +1,22 @@
+{
+    "displayName": "Standard",
+    "variantId": "arondight_clarent_Standard",
+    "hullId": "arondight_clarent",
+    "goalVariant": true,
+    "fluxCapacitors": 5,
+    "fluxVents": 10,
+    "hullMods": [],
+    "permaMods": [],
+    "sMods": [],
+    "weaponGroups": [
+        {
+            "autofire": false,
+            "mode": "LINKED",
+            "weapons": {
+                "WS_ARM_R": "arondight_clarent_arm"
+            }
+        }
+    ],
+    "wings": [],
+    "modules": []
+}

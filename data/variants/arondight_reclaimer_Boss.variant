@@ -1,0 +1,28 @@
+{
+    "displayName": "Boss",
+    "variantId": "arondight_reclaimer_Boss",
+    "hullId": "arondight_reclaimer",
+    "goalVariant": false,
+    "fluxCapacitors": 0,
+    "fluxVents": 0,
+    "hullMods": [],
+    "permaMods": [],
+    "sMods": [],
+    "weaponGroups": [
+        {
+            "autofire": true,
+            "mode": "LINKED",
+            "weapons": {
+                "WS_PD_L": "unstable_fragment",
+                "WS_PD_R": "unstable_fragment"
+            }
+        }
+    ],
+    "wings": [],
+    "modules": [
+        {"WS_MOD_N": "arondight_reclaimer_arm_Standard"},
+        {"WS_MOD_E": "arondight_reclaimer_arm_Standard"},
+        {"WS_MOD_S": "arondight_reclaimer_arm_Standard"},
+        {"WS_MOD_W": "arondight_reclaimer_arm_Standard"}
+    ]
+}
