@@ -1,9 +1,9 @@
 ![alt text](screenshots/arondight_promo_header.png)
 
 # Project Arondight
-> The lattice grows
+> The lattice grows.
 
-A crewed mech super-frigate, recovered from a derelict research habitat, and the missions around it. The mech can be upgraded through a variety of missions and skipp tree choices.
+A crewed mech super-frigate, recovered from a derelict research habitat, and the missions around it. The mech can be upgraded through a variety of missions and skill tree choices.
 
 Spoilers for [THREAT].
 
