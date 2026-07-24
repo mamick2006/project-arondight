@@ -4,11 +4,11 @@ Bastion Gauntlet,arondight_durendal_arm,,,100,450,,400,,60,15,0,,,,HIGH_EXPLOSIV
 Swift Gauntlet,arondight_hauteclere_arm,,,100,450,,150,,25,30,0,,,,HIGH_EXPLOSIVE,90,,0,1,1,,0,4,2,12,,800,,,,,,SYSTEM,arondight,,Special Acquisitions,,Assault,,,,,,,,,,
 Warden Gauntlet,arondight_joyeuse_arm,,,100,500,,250,,40,15,0,,,,HIGH_EXPLOSIVE,150,,0.2,2.2,1,,0,3,1,10,,700,,,,,,SYSTEM,arondight,,Special Acquisitions,,Assault,,,,,,,,,,
 Lance Rifle,arondight_longinus_arm,,,100,1400,,350,,80,10,0,,,,KINETIC,200,,0.6,3,1,,0,0,0,10,,3500,,,,,,SYSTEM,arondight,,Special Acquisitions,,Strike,,,,,,,,,,
-Gae Bolg,arondight_gaebolg_arm,,,100,900,,500,,100,12,0,,,,HIGH_EXPLOSIVE,300,,0.4,4,1,,0,1,0,10,,1200,,,,,,SYSTEM,arondight,,Special Acquisitions,,Strike,,,,,,,,,,
-Mercy Edge,arondight_curtana_arm,,,100,700,10,,,,25,0,,,,ENERGY,,60,0.1,0.2,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,Special,,,,,,,,,,
-Thief's Edge,arondight_clarent_arm,,,100,700,15,,,,25,0,,,,ENERGY,,80,0.1,0.2,5,3,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,Special,,,,,,,,,,
-Rhongomyniad,arondight_rhongomyniad_arm,,,100,750,150,,,,8,0,,,,ENERGY,,220,0.5,0.5,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,Strike,,,,,,,,,,
-The Answerer,arondight_fragarach_arm,,,100,500,,1,,,20,0,,,,ENERGY,400,,0.3,8,1,,0,0,0,10,,600,,,,,,SYSTEM,arondight,,Special Acquisitions,,Special,,,,,,,,,,TRUE
+Gae Bolg,arondight_gaebolg_arm,,,100,900,,500,,100,12,0,,,,HIGH_EXPLOSIVE,300,,0.4,4,1,,0,1,0,10,,1200,,,,,,SYSTEM,arondight,,Special Acquisitions,,Strike,,,,,"Every weapon deals %s damage, but consumes double ammo and locks for %s after it fires. If there is insufficient ammo, the frame takes %s of the weapon's damage. Destroying a ship removes the lock.",3x | 5 seconds | half,,,,
+Mercy Edge,arondight_curtana_arm,,,100,700,10,,,,25,0,,,,ENERGY,,60,0.1,0.2,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,Special,,,,,"As long as this beam is hitting a ship's hull, that ship is slowed to %s timeflow.",50%,,,,
+Thief's Edge,arondight_clarent_arm,,,100,700,15,,,,25,0,,,,ENERGY,,80,0.1,0.2,5,3,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,Special,,,,,"As long as this beam is hitting a ship's hull, the target is frozen, you vent flux %s as fast, weapon cooldowns are decreased by %s, and you drain %s hull per second from the target.",twice | 50% | 15,,,,
+Rhongomyniad,arondight_rhongomyniad_arm,,,100,750,150,,,,8,0,,,,ENERGY,,220,0.5,0.5,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,Strike,,,,,"This beam ramps up to %s damage over %s on a single target. Your top speed drops to %s while it fires, and switching targets resets the ramp.",4x | 6 seconds | 5%,,,,
+The Answerer,arondight_fragarach_arm,,,100,500,,1,,,20,0,,,,ENERGY,400,,0.3,8,1,,0,0,0,10,,600,,,,,,SYSTEM,arondight,,Special Acquisitions,,Special,,,,,"When fired, enemy units within %s units are slowed by %s for %s, and allies are sped up.",800 | 35% | 4 seconds,,,,TRUE
 Sealed Cover,arondight_sealed_cover,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
 Base Head,arondight_base_head,,,,1,1,,,,75,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999
 Base Pauldron L,arondight_base_pauldron_l,,,,1,1,,,,,0,,,,FRAGMENTATION,,,,10,,,,,,,,,,,,,,SYSTEM,arondight,,Special Acquisitions,,,,,,,,,,,,999

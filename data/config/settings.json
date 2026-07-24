@@ -166,9 +166,9 @@
     # Loom labyrinth (one exit, per-battle generation, no per-gate
     # checkpoints). The alpha bounds are the winnability/tension band the
     # generator rerolls against; seed 0 = random per battle.
-    "arondight_loom_sweeper_speed": 80,
+    "arondight_loom_sweeper_speed": 135,
     "arondight_loom_seed": 0,
-    "arondight_loom_alpha_min": 1.6,
+    "arondight_loom_alpha_min": 1.05,
     "arondight_loom_alpha_max": 2.4,
     "arondight_boss_phase2_hull": 0.65,
     "arondight_boss_phase3_hull": 0.30,

@@ -173,6 +173,7 @@
 		"hm_woven_header_count":"Woven (%s):"
 	},
 	"arondight_combat":{
-		"combat_loom_fire_lock":"FIRE CONTROL LOCKED FOR THE TRIAL"
+		"combat_loom_fire_lock":"FIRE CONTROL LOCKED FOR THE TRIAL",
+		"combat_loom_run":"RUN FOR THE EXIT"
 	}
 }

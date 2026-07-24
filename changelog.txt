@@ -1,3 +1,11 @@
+v1.0.1
+Save compatible. Can be added to existing saves.
+
+- Fixed the Curtana, Clarent, and Rhongomyniad codex entries.
+- The special arm weapons now describe what they do, not just the base ship.
+- Hopefully fixed the Loom mission's walls sometimes going invisible and its countdown freezing.
+- Added a setting to open management from the Intel screen instead of the bottom bar, for cross-mod compatibility.
+
 v1.0.0
 Can be added to existing saves.
 
