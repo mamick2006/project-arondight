@@ -1,0 +1,18 @@
+{
+	# hidden pattern-emitter weapon: never mounted, exists so the boss's
+	# scripted spawnProjectile can resolve the comb slug spec by weapon id
+	"id":"arondight_comb_slug",
+	"specClass":"projectile",
+	"type":"BALLISTIC",
+	"size":"SMALL",
+	"turretSprite":"graphics/arondight/ships/parts/arondight_base_arm_r.png",
+	"hardpointSprite":"graphics/arondight/ships/parts/arondight_base_arm_r.png",
+	"turretOffsets":[0, 0],
+	"turretAngleOffsets":[0],
+	"hardpointOffsets":[0, 0],
+	"hardpointAngleOffsets":[0],
+	"barrelMode":"LINKED",
+	"animationType":"NONE",
+	"projectileSpecId":"arondight_comb_slug",
+	"fireSoundTwo":"gauss_cannon_fire",
+}

@@ -60,7 +60,7 @@
     "arondight_respec_sp_cost": 1,
     "arondight_respec_bonus_xp": 1.0,
     # Form cost model (forms price like weave nodes): selecting a form transforms
-    # immediately and charges its tier cost EVERY time - no paid-form memory;
+    # immediately and charges its tier cost EVERY time, with no paid-form memory;
     # the Reclaimer still gates tier-2; respec refunds the era's actual charges
     "arondight_tier1_sp_cost": 2,
     "arondight_tier1_bonus_xp": 0.0,
@@ -80,9 +80,22 @@
     "arondight_node_armor_flat": 80,
     "arondight_node_fluxcap_mult": 1.15,
     "arondight_node_fluxdiss_mult": 1.15,
-    "arondight_node_speed_mult": 1.10,
+    "arondight_node_speed_flat": 10,
     "arondight_node_maneuver_mult": 1.25,
     "arondight_node_op_flat": 2,
+
+    # Mech part animation (all ten forms). The pauldrons and the visible left
+    # arm sway by a fraction of how far the arm on their side is aiming off the
+    # hull's heading; an arm kicks back from its mount when it fires. recoil_px
+    # is the kick in sprite pixels at the reference shot damage (100). A heavier
+    # arm scales up from there, and a beam leans instead of kicking.
+    # recoil_decay is how long a part takes to settle back, in seconds. The
+    # animated deco slots need a non-zero arc in the .ship files for any of
+    # this to move: the engine clamps a weapon's angle to its slot arc.
+    "arondight_part_track_factor": 0.5,
+    "arondight_part_arm_track_factor": 0.75,
+    "arondight_part_recoil_px": 2.0,
+    "arondight_part_recoil_decay": 0.18,
 
     # Stasis (Curtana line): sustained effects, no timed freezes. Curtana
     # slows to slow_mult while its beam holds a HULL (shield hits do nothing);
@@ -104,7 +117,7 @@
     "arondight_ward_heal_armor": 0.05,
     "arondight_ward_bulwark_anchor_mult": 0.1,
 
-    # Spotter (Longinus line): the entropy-amplifier shape - the marked
+    # Spotter (Longinus line): the entropy-amplifier shape, where the marked
     # target takes damage_mult on all four taken-damage channels for the
     # timed active; range gates the trigger (READY / OUT OF RANGE / NO TARGET)
     "arondight_spotter_damage_mult": 1.5,
@@ -170,10 +183,44 @@
     "arondight_loom_seed": 0,
     "arondight_loom_alpha_min": 1.05,
     "arondight_loom_alpha_max": 2.4,
-    "arondight_boss_phase2_hull": 0.65,
-    "arondight_boss_phase3_hull": 0.30,
+    # The single hull threshold. Stages III and IV are the two deaths, not
+    # hull bands, so this is the only hull edge the fight has.
+    "arondight_boss_stage2_hull": 0.50,
     "arondight_boss_regen_window_seconds": 6,
-    "arondight_boss_regen_hull_fraction": 0.35,
+    "arondight_boss_revive_grace_seconds": 3,
+    # first-volley grace whenever the aperture ring begins forming
+    "arondight_boss_wall_grace_seconds": 6.5,
+    # containment cage, stage I: ring radius on the player, its own convergence
+    # speed, and the marked gap. At 1400 and 220 against a 60-speed hull the
+    # radial escape solves at 5.0s, meeting the ring at r=300.
+    "arondight_boss_cage_interval": 8,
+    "arondight_boss_cage_radius": 1400,
+    "arondight_boss_cage_speed": 220,
+    "arondight_boss_cage_gap": 40,
+    # lattice figure, stage III: cadence of the nested expanding polygons
+    "arondight_boss_figure_interval": 3.5,
+    # the held figure's motionless tell, and the outer shell's apothem at the
+    # hold. Bullets sit 24 to a shell, so their real spacing is radius x 15
+    # degrees: 157su on the outer edge and 194su at a corner, which is the gap a
+    # player threads at release before the figure opens up.
+    "arondight_boss_hold_seconds": 1.2,
+    "arondight_boss_figure_radius": 600,
+    # harvest tide, stage IV: rank cadence, cross-flow spacing between columns,
+    # and how fast the flow heading precesses. Holding a lane costs
+    # r x precession, so 0.8 deg/s is 14 su/s at r=1000 and 60 at r=4300: inside
+    # a 60-speed hull's means where the fight happens, past it where hiding is.
+    "arondight_boss_rain_interval": 1.0,
+    "arondight_boss_rain_spacing": 200,
+    "arondight_boss_rain_precess": 0.8,
+    # slow lattice emission cadence (its ~20s life is range over speed)
+    "arondight_boss_drift_interval": 2,
+    # live boss-sourced guided missiles, and how many of them may be the
+    # heavy harrier class
+    "arondight_boss_guided_cap": 8,
+    "arondight_boss_guided_heavy_cap": 1,
+    # hull fraction each revive heals back to: first intercept, then second
+    "arondight_boss_regen_hull_fraction": 0.40,
+    "arondight_boss_regen_hull_fraction_2": 0.25,
     # radial = phase-I wall-volley cadence (code scales x0.88 for II and III);
     # aimed = the single-slug stream beat (x0.78/x0.61)
     "arondight_boss_radial_interval": 2.5,
@@ -181,13 +228,12 @@
     "arondight_boss_swarm_interval": 5,
     "arondight_boss_aimed_interval": 0.9,
     # rods is the shipped default: lattice bars, one wall layer instead of
-    # two, the most wall-like read - and the cheapest (rods hold ~238
+    # two, the most wall-like read, and the cheapest (rods hold ~238
     # entities flat where classic peaks ~496 concurrent and dips minimum
     # fps; heavy ~300, also capped). classic|heavy remain selectable.
     "arondight_boss_projectile_style": "rods",
     "arondight_boss_telegraph_seconds": 1.2,
     "arondight_boss_ring_radius": 5200,
-    "arondight_boss_ring_radius_p3": 2400,
     "arondight_boss_damage_mult": 0.5,
     "arondight_surge_time_mult": 2.5,
     "arondight_surge_duration_seconds": 1.5,

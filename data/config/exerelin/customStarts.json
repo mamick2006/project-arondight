@@ -1,0 +1,14 @@
+{
+	"starts":[
+		{
+			"id":"arondight_provenStart",
+			"name":"The Arondight",
+			"difficulty":"Normal",
+			"desc":"A spacer sold you coordinates past the edge of civilized space. The coordinates led you to Broceliande Station, an ancient abandoned Domain station with corridors laid out in wickerwork patterns. You broke a quarantine of warden drones, found a shining frame standing in a gantry, and proved you were worthy of claiming the mech for yourself. Or at least, the station had given up on finding anyone more worthy.\n\nBegin with the Arondight and a salvage tender. Transform the frame between its hull forms and weave its lattice from the Manage screen. (Note that this can also be unlocked through regular play).",
+			"className":"arondight.campaign.nex.ArondightNexStart",
+			"factionId":"player",
+			"requiredModId":"nexerelin",
+			"randomSector":0,	# 0 = both sector types, 1 = random only, -1 = non-random only
+		},
+	],
+}

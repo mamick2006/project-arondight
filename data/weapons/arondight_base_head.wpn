@@ -12,4 +12,5 @@
 	"barrelMode":"LINKED",
 	"animationType":"NONE",
 	"projectileSpecId":"arondight_pulse_dud",
+	"everyFrameEffect":"arondight.form.mechanics.PartAnimationEffect",
 }

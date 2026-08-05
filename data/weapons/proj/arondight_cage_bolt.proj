@@ -1,0 +1,26 @@
+{
+	# the containment cage's bolt. Slow on purpose: the cage spawns as a ring
+	# around the PLAYER and converges, so the bolt's own 220 speed IS the
+	# convergence rate and no script touches its velocity. Range 1500 covers
+	# the 1400 spawn radius plus slack, so a bolt that reaches the centre dies
+	# there rather than crossing back out.
+	"id":"arondight_cage_bolt",
+	"specClass":"projectile",
+	"spawnType":"BALLISTIC",
+	"collisionClass":"PROJECTILE_FF",
+	"collisionClassByFighter":"PROJECTILE_FIGHTER",
+	"length":34.0,
+	"hitGlowRadius":55,
+	"width":18.0,
+	"fadeTime":0.4,
+	"fringeColor":[255,190,120,210],
+	"coreColor":[255,245,225,240],
+	"glowColor":[255,190,120,110],
+	"glowRadius":45,
+	"textureScrollSpeed":48.0,
+	"pixelsPerTexel":5.0,
+	"passThroughMissiles":true,
+	"passThroughFighters":true,
+	"passThroughFightersOnlyWhenDestroyed":true,
+	"bulletSprite":"graphics/missiles/shell_hellbore.png"
+}

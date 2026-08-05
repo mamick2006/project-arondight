@@ -1,3 +1,15 @@
+v1.0.2
+Save compatible. Can be added to existing saves.
+
+- Adjusted mech animations to make them more dynamic, based on Diable Avionics and Arma Armatura
+- Hovering a greyed-out button now says why it is unavailable.
+- Fixed a crash when a weapon with moving parts was fitted to the mech's arm mount.
+- The Loom's walls are no longer eaten by mods that deconstruct wrecks mid-fight.
+- Fixed some display issues with the habitat, the relay and the Deep Anchorage.
+- With Nexerelin installed, a new start called The Arondight begins with the mech already recovered.
+- Adjusted Reclaimer boss fight to fix bugs and make it more interesting.
+- Woven perk names are now coloured in the Morphogenic Lattice tooltip.
+
 v1.0.1
 Save compatible. Can be added to existing saves.
 

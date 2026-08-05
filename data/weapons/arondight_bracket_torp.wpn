@@ -1,0 +1,18 @@
+{
+	# hidden pattern-emitter weapon: never mounted, exists so the boss's
+	# scripted spawnProjectile can resolve the bracket torpedo spec by weapon id
+	"id":"arondight_bracket_torp",
+	"specClass":"projectile",
+	"type":"MISSILE",
+	"size":"SMALL",
+	"turretSprite":"graphics/arondight/ships/parts/arondight_base_arm_r.png",
+	"hardpointSprite":"graphics/arondight/ships/parts/arondight_base_arm_r.png",
+	"turretOffsets":[0, 0],
+	"turretAngleOffsets":[0],
+	"hardpointOffsets":[0, 0],
+	"hardpointAngleOffsets":[0],
+	"barrelMode":"LINKED",
+	"animationType":"NONE",
+	"projectileSpecId":"reaper_torp",
+	"fireSoundTwo":"reaper_fire",
+}

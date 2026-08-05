@@ -60,7 +60,7 @@
       "size": "SMALL",
       "type": "DECORATIVE",
       "mount": "TURRET",
-      "arc": 0,
+      "arc": 90,
       "angle": 16,
       "locations": [
         4,
@@ -96,7 +96,7 @@
       "size": "SMALL",
       "type": "DECORATIVE",
       "mount": "TURRET",
-      "arc": 0,
+      "arc": 90,
       "angle": -20,
       "locations": [
         7,
@@ -109,7 +109,7 @@
       "size": "SMALL",
       "type": "DECORATIVE",
       "mount": "TURRET",
-      "arc": 0,
+      "arc": 90,
       "angle": 20,
       "locations": [
         7,

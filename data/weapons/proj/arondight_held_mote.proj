@@ -1,0 +1,26 @@
+{
+	# the held volley's bullet. A PROJECTILE and not a missile on purpose: a
+	# projectile carries no thrust, so one getVelocity().set(0,0) holds it
+	# still for the whole 1.2s tell, and a bullet that travels no distance
+	# never spends its range. A missile re-accelerates every frame and would
+	# need a per-frame loop over the held list to stand still.
+	"id":"arondight_held_mote",
+	"specClass":"projectile",
+	"spawnType":"BALLISTIC",
+	"collisionClass":"PROJECTILE_FF",
+	"collisionClassByFighter":"PROJECTILE_FIGHTER",
+	"length":26.0,
+	"hitGlowRadius":50,
+	"width":16.0,
+	"fadeTime":0.4,
+	"fringeColor":[140,255,190,210],
+	"coreColor":[235,255,245,240],
+	"glowColor":[140,255,190,130],
+	"glowRadius":42,
+	"textureScrollSpeed":64.0,
+	"pixelsPerTexel":5.0,
+	"passThroughMissiles":true,
+	"passThroughFighters":true,
+	"passThroughFightersOnlyWhenDestroyed":true,
+	"bulletSprite":"graphics/missiles/shell_hellbore.png"
+}

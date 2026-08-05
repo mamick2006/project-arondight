@@ -1,0 +1,23 @@
+{
+	# the swept comb's slug. A mod-owned copy of the hveldriver's ballistics
+	# carrying ZERO EMP: the comb's job is spatial denial, and 400 EMP a slug
+	# across ~150 slugs a fan disables engines, which in a bullet-hell fight
+	# kills by a route the pattern was never meant to threaten.
+	"id":"arondight_comb_slug",
+	"specClass":"projectile",
+	"spawnType":"BALLISTIC",
+	"collisionClass":"PROJECTILE_FF",
+	"collisionClassByFighter":"PROJECTILE_FIGHTER",
+	"length":30.0,
+	"hitGlowRadius":40,
+	"width":11.0,
+	"fadeTime":0.3,
+	"fringeColor":[170,235,255,200],
+	"coreColor":[240,252,255,240],
+	"textureScrollSpeed":64.0,
+	"pixelsPerTexel":5.0,
+	"passThroughMissiles":true,
+	"passThroughFighters":true,
+	"passThroughFightersOnlyWhenDestroyed":true,
+	"bulletSprite":"graphics/missiles/shell_gauss_cannon.png"
+}

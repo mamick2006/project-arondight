@@ -1,0 +1,25 @@
+{
+	# the slow lattice: hanging terrain rather than a threat stream. Its ~20s
+	# of life is range over speed, 800/40, because flight time is not settable
+	# on a projectile; the pair is the spec, and changing either changes how
+	# long the arena stays cluttered.
+	"id":"arondight_drift_mote",
+	"specClass":"projectile",
+	"spawnType":"BALLISTIC",
+	"collisionClass":"PROJECTILE_FF",
+	"collisionClassByFighter":"PROJECTILE_FIGHTER",
+	"length":22.0,
+	"hitGlowRadius":60,
+	"width":22.0,
+	"fadeTime":0.8,
+	"fringeColor":[120,200,170,190],
+	"coreColor":[225,255,240,225],
+	"glowColor":[120,200,170,120],
+	"glowRadius":55,
+	"textureScrollSpeed":12.0,
+	"pixelsPerTexel":5.0,
+	"passThroughMissiles":true,
+	"passThroughFighters":true,
+	"passThroughFightersOnlyWhenDestroyed":true,
+	"bulletSprite":"graphics/missiles/shell_hellbore.png"
+}

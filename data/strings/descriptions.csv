@@ -37,3 +37,6 @@ arondight_curtana_arm,WEAPON,"A blade-format beam that barely scratches a hull. 
 arondight_clarent_arm,WEAPON,"A shorter, hungrier weave of the mercy edge. While its target is frozen, the frame vents heat down the blade's thread and pulls material back up it.",,,,,
 arondight_fragarach_arm,WEAPON,"A bladeless hilt that casts the freeze outward as a pulse: hostiles are slowed, friendlies are accelerated.",,,,,
 arondight_sealed_cover,WEAPON,A grown-shut housing where a missile cell should be. The lattice keeps it sealed until the weave unseals it.,,,,,
+arondight_habitat,CUSTOM,"An orbital research habitat. A cursory scan finds power still running in the hull, but no sign that anything has docked here in years.",,,,,
+arondight_relay,CUSTOM,"A Domain-era hyperwave frontier array, built to pass traffic between systems faster than light.",,,,,
+arondight_staging,CUSTOM,"An unfinished Domain construction site: a bare spine with a reactor mast at one end.",,,,,
