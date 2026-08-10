@@ -9,7 +9,7 @@ Spoilers for [THREAT].
 
 No required dependencies. Optional integration with Arma Armatura and LunaLib. Can be added to existing saves.
 
-Forum link: TODO
+[Forum link](https://fractalsoftworks.com/forum/index.php?topic=35861.0)
 
 ## Screenshots
 

@@ -9,8 +9,7 @@
     "modName":"Project Arondight",
 
     # The ID of the thread where updates to this mod can be found (optional).
-    # No forum thread yet.
-    # "modThreadId":00000,
+    "modThreadId":35861,
 
     # The current patch number
     # Notation is major.minor.patch; trailing zeros are ignored
