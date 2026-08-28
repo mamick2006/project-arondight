@@ -214,10 +214,16 @@ final class WeaveApplier {
     }
 
     private static void escalateLogistics(ShipHullSpecAPI clone, int appliedCount) {
+        int step = ArondightSettings.weaveLogisticsStep();
+        clone.addTag(ArondightIds.TAG_LOGISTICS_STEP_PREFIX + step);
         if (appliedCount <= 0) return;
-        float add = appliedCount * (float) ArondightSettings.weaveLogisticsStep();
+        float add = appliedCount * (float) step;
         clone.setSuppliesToRecover(clone.getSuppliesToRecover() + add);
         clone.setSuppliesPerMonth(clone.getSuppliesPerMonth() + add);
+    }
+
+    private static String currentLogisticsTag() {
+        return ArondightIds.TAG_LOGISTICS_STEP_PREFIX + ArondightSettings.weaveLogisticsStep();
     }
 
     private static List<String> tryMutateAll(ShipHullSpecAPI clone, ShipVariantAPI variant, List<String> woven) {
@@ -306,12 +312,14 @@ final class WeaveApplier {
     static void reapplyPlayerFleetIfNeeded() {
         if (Global.getSector() == null || Global.getSector().getPlayerFleet() == null) return;
         if (!ArondightState.hasAnyFrame()) return;
+        String logisticsTag = currentLogisticsTag();
         for (FleetMemberAPI member : Global.getSector().getPlayerFleet().getFleetData().getMembersListCopy()) {
             if (!ArondightState.isFrame(member.getId())) continue;
             ShipVariantAPI variant = member.getVariant();
             if (variant == null) continue;
             ShipHullSpecAPI spec = variant.getHullSpec();
-            if (spec != null && spec.getTags().contains(ArondightIds.TAG_APPLIED)) continue;
+            if (spec != null && spec.getTags().contains(ArondightIds.TAG_APPLIED)
+                    && spec.getTags().contains(logisticsTag)) continue;
             apply(member);
         }
     }

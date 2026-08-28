@@ -16,7 +16,8 @@ public final class ArondightSettings {
 
     private static final Set<String> LUNA_INTS = new HashSet<>(Arrays.asList(
             ArondightIds.SET_NODE_SP_COST, ArondightIds.SET_TIER1_SP_COST,
-            ArondightIds.SET_TIER2_SP_COST, ArondightIds.SET_RESPEC_SP_COST));
+            ArondightIds.SET_TIER2_SP_COST, ArondightIds.SET_RESPEC_SP_COST,
+            ArondightIds.SET_WEAVE_LOGISTICS_STEP));
 
     private ArondightSettings() {}
 
@@ -109,7 +110,17 @@ public final class ArondightSettings {
         return getInt(ArondightIds.SET_WEAVE_CAP, 12);
     }
 
+    static final int LOGISTICS_STEP_MIN = 0;
+    static final int LOGISTICS_STEP_MAX = 3;
+
+    static int clampLogisticsStep(int configured) {
+        if (configured <= LOGISTICS_STEP_MIN) {
+            return LOGISTICS_STEP_MIN;
+        }
+        return configured > LOGISTICS_STEP_MAX ? LOGISTICS_STEP_MAX : configured;
+    }
+
     public static int weaveLogisticsStep() {
-        return getInt(ArondightIds.SET_WEAVE_LOGISTICS_STEP, 2);
+        return clampLogisticsStep(getInt(ArondightIds.SET_WEAVE_LOGISTICS_STEP, 2));
     }
 }

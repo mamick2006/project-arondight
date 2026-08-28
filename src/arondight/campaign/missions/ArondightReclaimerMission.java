@@ -1,6 +1,7 @@
 package arondight.campaign.missions;
 
 import java.awt.Color;
+import java.util.Random;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
@@ -10,6 +11,7 @@ import com.fs.starfarer.api.campaign.StarSystemAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 import com.fs.starfarer.api.fleet.FleetMemberType;
+import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
 import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.impl.campaign.missions.hub.HubMissionWithSearch;
 import com.fs.starfarer.api.impl.campaign.missions.hub.MissionTrigger.TriggerAction;
@@ -32,6 +34,12 @@ public class ArondightReclaimerMission extends HubMissionWithSearch {
 	}
 
 	public static final String ESCORT_DEFEAT_TRIGGER = "ArondightEscortDefeated";
+	public static final String RELAY_ENTITY = "arondight_relay";
+	public static final String RELAY_FLAG = "$arondight_relay";
+	public static final String RELAY_IMPORTANT_FLAG = "$arondight_rec_imp";
+	public static final String STAGING_ENTITY = "arondight_staging";
+	public static final String STAGING_FLAG = "$arondight_staging";
+	public static final String STAGING_IMPORTANT_FLAG = "$arondight_staging_imp";
 
 	protected StarSystemAPI relaySystem;
 	protected StarSystemAPI stagingSystem;
@@ -54,10 +62,9 @@ public class ArondightReclaimerMission extends HubMissionWithSearch {
 		relaySystem = pickSystem();
 		if (relaySystem == null) return false;
 
-		relay = spawnEntity("arondight_relay", new LocData(EntityLocationType.UNCOMMON, null, relaySystem, false));
+		relay = spawnEntity(RELAY_ENTITY, new LocData(EntityLocationType.UNCOMMON, null, relaySystem, false));
 		if (relay == null) return false;
-		relay.getMemoryWithoutUpdate().set("$arondight_relay", true);
-		relay.setDiscoverable(true);
+		dressRelay();
 
 		requireSystemTags(ReqMode.NOT_ANY, Tags.THEME_CORE_POPULATED);
 		requireSystemWithinRangeOf(relay.getLocationInHyperspace(), 12f);
@@ -66,16 +73,12 @@ public class ArondightReclaimerMission extends HubMissionWithSearch {
 		stagingSystem = pickSystem();
 		if (stagingSystem == null) return false;
 
-		staging = spawnEntity("arondight_staging", new LocData(EntityLocationType.HIDDEN_NOT_NEAR_STAR, null, stagingSystem, false));
+		staging = spawnEntity(STAGING_ENTITY, new LocData(EntityLocationType.HIDDEN_NOT_NEAR_STAR, null, stagingSystem, false));
 		if (staging == null) return false;
-		staging.getMemoryWithoutUpdate().set("$arondight_staging", true);
-		staging.setDiscoverable(true);
+		dressStaging();
 
 		setStartingStage(Stage.GO_TO_RELAY);
 		addSuccessStages(Stage.COMPLETED);
-
-		makeImportant(relay, "$arondight_rec_imp", Stage.GO_TO_RELAY, Stage.ESCORT_FIGHT);
-		makeImportant(staging, "$arondight_staging_imp", Stage.TO_STAGING);
 
 		connectWithGlobalFlag(Stage.GO_TO_RELAY, Stage.ESCORT_FIGHT, ArondightQuest.RELAY_SCANNED);
 		connectWithGlobalFlag(Stage.ESCORT_FIGHT, Stage.TO_STAGING, ArondightQuest.ESCORT_DEFEATED);
@@ -101,6 +104,7 @@ public class ArondightReclaimerMission extends HubMissionWithSearch {
 
 		@Override
 		public void doAction(TriggerActionContext context) {
+			if (ArondightQuest.gone(relay)) return;
 			CampaignFleetAPI fleet = Global.getFactory().createEmptyFleet("threat", "Reclamation Escort", true);
 			fleet.setNoFactionInName(true);
 			addUnit(fleet, "skirmish_unit_Type100");
@@ -118,6 +122,7 @@ public class ArondightReclaimerMission extends HubMissionWithSearch {
 
 			Misc.addDefeatTrigger(fleet, ESCORT_DEFEAT_TRIGGER);
 			fleet.getMemoryWithoutUpdate().set(ESCORT_FLEET_FLAG, true);
+			hardenEscort(fleet);
 
 			CampaignFleetAPI player = Global.getSector().getPlayerFleet();
 			fleet.addAssignment(FleetAssignment.INTERCEPT, player, 20f);
@@ -133,19 +138,66 @@ public class ArondightReclaimerMission extends HubMissionWithSearch {
 		}
 	}
 
-	public void retrofitEscort() {
-		if (isEnded() || relay == null || relay.getContainingLocation() == null) return;
+	public static void hardenEscort(CampaignFleetAPI fleet) {
+		if (fleet == null) return;
+		fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_IGNORED_BY_OTHER_FLEETS, true);
+	}
+
+	protected void dressRelay() {
+		relay.getMemoryWithoutUpdate().set(RELAY_FLAG, true);
+		relay.setDiscoverable(true);
+		makeImportant(relay, RELAY_IMPORTANT_FLAG, Stage.GO_TO_RELAY, Stage.ESCORT_FIGHT);
+	}
+
+	protected void dressStaging() {
+		staging.getMemoryWithoutUpdate().set(STAGING_FLAG, true);
+		staging.setDiscoverable(true);
+		makeImportant(staging, STAGING_IMPORTANT_FLAG, Stage.TO_STAGING);
+	}
+
+	protected void ensureGenRandom() {
+		if (genRandom == null) {
+			setGenRandom(new Random());
+		}
+	}
+
+	protected void ensureEntities() {
+		if (relaySystem != null && ArondightQuest.gone(relay)) {
+			SectorEntityToken fresh = spawnEntity(RELAY_ENTITY,
+					new LocData(EntityLocationType.UNCOMMON, null, relaySystem, false));
+			if (fresh != null) {
+				relay = fresh;
+				dressRelay();
+			}
+		}
+		if (stagingSystem != null && ArondightQuest.gone(staging)) {
+			SectorEntityToken fresh = spawnEntity(STAGING_ENTITY,
+					new LocData(EntityLocationType.HIDDEN_NOT_NEAR_STAR, null, stagingSystem, false));
+			if (fresh != null) {
+				staging = fresh;
+				dressStaging();
+			}
+		}
+	}
+
+	public void ensureEscort() {
+		if (isEnded()) return;
+		ensureGenRandom();
+		ensureEntities();
+		if (ArondightQuest.gone(relay) || relay.getContainingLocation() == null) return;
 		boolean alive = false;
 		for (CampaignFleetAPI f : relay.getContainingLocation().getFleets()) {
 			if (!f.getMemoryWithoutUpdate().getBoolean(ESCORT_FLEET_FLAG)) continue;
 			alive = true;
 			f.setAIMode(true);
+			hardenEscort(f);
 			for (FleetMemberAPI m : f.getFleetData().getMembersListCopy()) {
 				m.getRepairTracker().setCR(Math.max(m.getRepairTracker().getCR(), 0.7f));
 			}
 		}
 		if (!alive && currentStage == Stage.ESCORT_FIGHT
-				&& !ArondightQuest.mem(ArondightQuest.ESCORT_DEFEATED)) {
+				&& !ArondightQuest.mem(ArondightQuest.ESCORT_DEFEATED)
+				&& !ArondightQuest.mem(ArondightQuest.M2_DONE)) {
 			new SpawnThreatEscort(relay).doAction(null);
 		}
 	}

@@ -17,7 +17,9 @@ import com.fs.starfarer.api.combat.BeamAPI;
 import com.fs.starfarer.api.combat.DamagingProjectileAPI;
 import com.fs.starfarer.api.combat.MissileAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.combat.ShipCommand;
 import com.fs.starfarer.api.combat.WeaponAPI;
+import com.fs.starfarer.api.combat.WeaponGroupAPI;
 import com.fs.starfarer.api.combat.listeners.AdvanceableListener;
 import com.fs.starfarer.api.combat.listeners.DamageDealtModifier;
 import com.fs.starfarer.api.combat.listeners.DamageTakenModifier;
@@ -62,6 +64,7 @@ public class LatticeCombatPlugin implements AdvanceableListener, DamageTakenModi
     private final List<ShipAPI> watchdogs = new ArrayList<>(2);
     private final float[] watchdogRespawnClock = new float[2];
     private float droneOrbitAngle = 0f;
+    private float droneLeash = 220f;
 
     public LatticeCombatPlugin(ShipAPI ship, Set<String> nodes) {
         this.ship = ship;
@@ -93,7 +96,11 @@ public class LatticeCombatPlugin implements AdvanceableListener, DamageTakenModi
         if (slowInterval.intervalElapsed()) {
             float elapsed = slowInterval.getElapsed();
             if (selfWeave) selfWeaveTick(elapsed);
-            if (drones) watchdogRespawnTick(engine, elapsed);
+            if (drones) {
+                droneLeash = ArondightSettings.getFloat("arondight_watchdog_leash", 220f);
+                watchdogRespawnTick(engine, elapsed);
+                watchdogAutofireTick();
+            }
             if (bleed) {
                 if (ship.getFluxTracker().isVenting()) {
                     bleedTick(engine);
@@ -122,18 +129,26 @@ public class LatticeCombatPlugin implements AdvanceableListener, DamageTakenModi
             }
         }
         if (drones) {
+            droneLeash = ArondightSettings.getFloat("arondight_watchdog_leash", 220f);
             for (int i = 0; i < 2; i++) {
                 watchdogs.add(spawnWatchdog(engine, i * 180f));
             }
         }
     }
 
+    static final String WATCHDOG_VARIANT_DEFAULT = "drone_terminator";
+
     private ShipAPI spawnWatchdog(CombatEngineAPI engine, float angleDeg) {
-        String variantId = ArondightSettings.getString("arondight_watchdog_variant", "wasp_Interceptor");
+        String variantId = ArondightSettings.getString("arondight_watchdog_variant",
+                WATCHDOG_VARIANT_DEFAULT);
         try {
             ShipAPI drone = engine.getFleetManager(ship.getOwner())
                     .spawnShipOrWing(variantId, orbitPoint(angleDeg), ship.getFacing());
-            if (drone != null) drone.setDrone(true);
+            if (drone != null) {
+                drone.setDrone(true);
+                drone.giveCommand(ShipCommand.SELECT_GROUP, null, 99);
+                drone.setShipAI(null);
+            }
             return drone;
         } catch (Exception e) {
             arondight.util.ArondightLog.warnOnce("watchdog_spawn",
@@ -154,17 +169,32 @@ public class LatticeCombatPlugin implements AdvanceableListener, DamageTakenModi
         }
     }
 
-    private void keepDronesLeashed(float amount) {
-        droneOrbitAngle += amount * 40f;
-        float leash = ArondightSettings.getFloat("arondight_watchdog_leash", 220f);
+    private void watchdogAutofireTick() {
         for (int i = 0; i < watchdogs.size(); i++) {
             ShipAPI drone = watchdogs.get(i);
             if (drone == null || !drone.isAlive()) continue;
-            Vector2f anchor = orbitPoint(droneOrbitAngle + i * 180f);
-            float dx = drone.getLocation().x - anchor.x, dy = drone.getLocation().y - anchor.y;
-            if (dx * dx + dy * dy > leash * leash) {
-                drone.getVelocity().set((anchor.x - drone.getLocation().x) * 1.5f,
-                        (anchor.y - drone.getLocation().y) * 1.5f);
+            List<WeaponGroupAPI> groups = drone.getWeaponGroupsCopy();
+            for (int g = 0; g < groups.size(); g++) {
+                if (!groups.get(g).isAutofiring()) {
+                    drone.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, null, g);
+                }
+            }
+        }
+    }
+
+    private void keepDronesLeashed(float amount) {
+        droneOrbitAngle += amount * 40f;
+        float radius = ship.getCollisionRadius() + 90f;
+        float shipX = ship.getLocation().x, shipY = ship.getLocation().y;
+        for (int i = 0; i < watchdogs.size(); i++) {
+            ShipAPI drone = watchdogs.get(i);
+            if (drone == null || !drone.isAlive()) continue;
+            double rad = Math.toRadians(droneOrbitAngle + i * 180f);
+            float anchorX = shipX + (float) (radius * Math.cos(rad));
+            float anchorY = shipY + (float) (radius * Math.sin(rad));
+            float dx = drone.getLocation().x - anchorX, dy = drone.getLocation().y - anchorY;
+            if (dx * dx + dy * dy > droneLeash * droneLeash) {
+                drone.getVelocity().set(-dx * 1.5f, -dy * 1.5f);
             }
         }
     }

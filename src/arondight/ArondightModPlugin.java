@@ -15,18 +15,39 @@ public class ArondightModPlugin extends BaseModPlugin {
     @Override
     public void onApplicationLoad() throws Exception {
         if (Global.getSettings().getModManager().isModEnabled("armaa")) {
+            boolean drive;
+            try {
+                drive = Global.getSettings().getShipSystemSpec("armaa_traveldrive") != null;
+            } catch (Exception e) {
+                drive = false;
+            }
+            if (!drive) {
+                ArondightLog.warnOnce("armaa_traveldrive_missing", "armaa is enabled but ships no"
+                        + " 'armaa_traveldrive' ship system; the frame keeps the rest of the graft"
+                        + " and launches from the map edge");
+            }
             for (String hullId : ArondightIds.ALL_FORMS) {
-                try {
-                    ShipHullSpecAPI spec = Global.getSettings().getHullSpec(hullId);
-                    if (spec == null) continue;
-                    for (String modId : ARMAA_MODS) {
-                        spec.addBuiltInMod(modId);
-                    }
-                    spec.addTag("independent_of_carrier");
-                } catch (Exception e) {
-                    ArondightLog.warnOnce("armaa_graft_" + hullId, "armaa graft skipped for missing hull '"
-                            + hullId + "' (" + e + ")");
-                }
+                graft(hullId, drive, true);
+                graft(hullId + "_default_D", drive, false);
+            }
+        }
+    }
+
+    private static void graft(String hullId, boolean drive, boolean required) {
+        try {
+            ShipHullSpecAPI spec = Global.getSettings().getHullSpec(hullId);
+            if (spec == null) return;
+            for (String modId : ARMAA_MODS) {
+                spec.addBuiltInMod(modId);
+            }
+            spec.addTag("independent_of_carrier");
+            if (drive) {
+                spec.setTravelDriveId("armaa_traveldrive");
+            }
+        } catch (Exception e) {
+            if (required) {
+                ArondightLog.warnOnce("armaa_graft_" + hullId, "armaa graft skipped for missing hull '"
+                        + hullId + "' (" + e + ")");
             }
         }
     }

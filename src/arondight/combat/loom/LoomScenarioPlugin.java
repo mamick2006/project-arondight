@@ -32,6 +32,9 @@ public class LoomScenarioPlugin extends BaseEveryFrameCombatPlugin {
 	protected Vector2f exitGate;
 	protected int nextGate = 0;
 	protected boolean over = false;
+	protected ShipAPI playerFrame = null;
+	protected float noPlayerSeconds = 0f;
+	protected static final float NO_PLAYER_LIMIT = 10f;
 	protected LethalSaveScript lethalSave = null;
 	protected boolean weaponsLocked = false;
 	protected boolean systemDisabled = false;
@@ -263,12 +266,53 @@ public class LoomScenarioPlugin extends BaseEveryFrameCombatPlugin {
 		}
 	}
 
+	protected String frameLost(ShipAPI reported) {
+		ShipAPI frame = reported != null && !reported.isShuttlePod() ? reported : playerFrame;
+		if (frame == null) {
+			return "the engine offers only its stand-in shuttle and this trial never "
+					+ "flew a frame";
+		}
+		if (frame != reported) {
+			return "the engine swapped the frame for its stand-in shuttle";
+		}
+		if (frame.isAlive()) {
+			return null;
+		}
+		if (frame.isHulk()) {
+			return "the frame is a wreck";
+		}
+		if (!engine.isEntityInPlay(frame)) {
+			return "the frame was removed from the battle at "
+					+ (int) frame.getHitpoints() + " hp";
+		}
+		return "the frame reads dead in play at " + (int) frame.getHitpoints() + " hp";
+	}
+
 	@Override
 	public void advance(float amount, List<InputEventAPI> events) {
 		if (engine == null || engine.isPaused() || over) return;
 
 		try {
 			ShipAPI player = engine.getPlayerShip();
+			if (player != null && !player.isShuttlePod()) {
+				playerFrame = player;
+			}
+			String lost = frameLost(player);
+			if (lost != null) {
+				player = null;
+				noPlayerSeconds += amount;
+				if (noPlayerSeconds > NO_PLAYER_LIMIT) {
+					Global.getLogger(LoomScenarioPlugin.class).warn(
+							"Project Arondight: no player frame in the Loom for "
+									+ NO_PLAYER_LIMIT + "s (" + lost + "); ending the "
+									+ "trial as a loss instead of leaving a battle "
+									+ "nothing can end");
+					lose(null);
+					return;
+				}
+			} else {
+				noPlayerSeconds = 0f;
+			}
 			if (player != null && lethalSave == null) {
 				lethalSave = new LethalSaveScript(player, "THE COURSE POWERS DOWN");
 				player.addListener(lethalSave);
@@ -443,6 +487,7 @@ public class LoomScenarioPlugin extends BaseEveryFrameCombatPlugin {
 			wall.setFacing(home[2]);
 			wall.setAngularVelocity(0f);
 			wall.setHitpoints(wall.getMaxHitpoints());
+			wall.setHulk(false);
 			wall.setStation(true);
 			wall.setAlphaMult(1f);
 		}

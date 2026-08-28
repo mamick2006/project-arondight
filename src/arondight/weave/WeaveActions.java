@@ -46,7 +46,7 @@ final class WeaveActions {
         }
         int cost = ArondightSettings.nodeSpCost();
         if (playerStats() == null || playerStats().getStoryPoints() < cost) {
-            return ArondightStrings.weave("weave_block_requires_sp");
+            return requiresSp(cost);
         }
         if (!ArondightBudget.fits(memberId, cost)) {
             return ArondightStrings.console("console_block_budget",
@@ -76,10 +76,16 @@ final class WeaveActions {
                 && relockableForms(member.getId()).isEmpty()) {
             return ArondightStrings.weave("weave_block_nothing_to_unwind");
         }
-        if (playerStats() == null || playerStats().getStoryPoints() < ArondightSettings.respecSpCost()) {
-            return ArondightStrings.weave("weave_block_requires_sp");
+        int cost = ArondightSettings.respecSpCost();
+        if (playerStats() == null || playerStats().getStoryPoints() < cost) {
+            return requiresSp(cost);
         }
         return null;
+    }
+
+    private static String requiresSp(int cost) {
+        return cost == 1 ? ArondightStrings.weave("weave_block_requires_sp_one", cost)
+                : ArondightStrings.weave("weave_block_requires_sp_many", cost);
     }
 
     static java.util.List<String> relockableForms(String memberId) {

@@ -30,7 +30,11 @@ public class ArondightSignalIntel extends BaseIntelPlugin {
 		if (Global.getSector() == null || ArondightQuest.mem(ArondightQuest.M2_DONE)) {
 			return;
 		}
-		if (get() != null) {
+		ArondightSignalIntel existing = get();
+		if (existing != null) {
+			if (!existing.answered && wait != null) {
+				existing.wait = wait;
+			}
 			return;
 		}
 		ArondightSignalIntel intel = new ArondightSignalIntel();

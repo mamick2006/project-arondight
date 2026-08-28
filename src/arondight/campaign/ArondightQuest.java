@@ -1,6 +1,8 @@
 package arondight.campaign;
 
+import com.fs.starfarer.api.EveryFrameScript;
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.TextPanelAPI;
 import com.fs.starfarer.api.combat.ShipVariantAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
@@ -18,6 +20,7 @@ import arondight.campaign.missions.ArondightReclaimerMission;
 import arondight.campaign.missions.ArondightReclaimerWaitScript;
 import arondight.form.ArondightTransformer;
 import arondight.state.ArondightState;
+import arondight.util.ArondightLog;
 import arondight.util.ArondightSettings;
 
 public class ArondightQuest {
@@ -114,19 +117,51 @@ public class ArondightQuest {
 
 		Object loom = Global.getSector().getMemoryWithoutUpdate().get(ArondightLoomMission.GLOBAL_REF);
 		if (loom instanceof ArondightLoomMission) {
-			((ArondightLoomMission) loom).retrofitHoldWatch();
+			try {
+				((ArondightLoomMission) loom).ensureWatch();
+			} catch (Exception e) {
+				ArondightLog.warnOnce("ensureWatchOnLoad",
+						"could not repair the quarantine watch on load (" + e
+						+ "); interacting with the station tries again.");
+			}
 		}
 
 		Object rec = Global.getSector().getMemoryWithoutUpdate().get("$arondight_rec_ref");
 		if (rec instanceof ArondightReclaimerMission) {
-			((ArondightReclaimerMission) rec).retrofitEscort();
+			try {
+				((ArondightReclaimerMission) rec).ensureEscort();
+			} catch (Exception e) {
+				ArondightLog.warnOnce("ensureEscortOnLoad",
+						"could not repair the Reclamation Escort on load (" + e
+						+ "); interacting with the relay tries again.");
+			}
 		}
+
+		ensureReclaimerBridge();
 
 		arondight.combat.loom.LoomScenarioPlugin.resetForLoad();
 	}
 
+	public static void ensureReclaimerBridge() {
+		if (!mem(M1_DONE) || mem(M2_DONE)) return;
+		if (Global.getSector().getMemoryWithoutUpdate().get("$arondight_rec_ref")
+				instanceof ArondightReclaimerMission) {
+			return;
+		}
+		for (EveryFrameScript script : Global.getSector().getScripts()) {
+			if (script instanceof ArondightReclaimerWaitScript) return;
+		}
+		ArondightReclaimerWaitScript again = new ArondightReclaimerWaitScript();
+		Global.getSector().addScript(again);
+		ArondightSignalIntel.onLoomWin(again);
+	}
+
 	public static boolean mem(String flag) {
 		return Global.getSector().getMemoryWithoutUpdate().getBoolean(flag);
+	}
+
+	public static boolean gone(SectorEntityToken entity) {
+		return entity == null || !entity.isAlive();
 	}
 
 	public static void set(String flag) {

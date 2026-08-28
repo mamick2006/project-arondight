@@ -72,7 +72,12 @@ public class ReclaimerPhaseScript implements AdvanceableListener, HullDamageAbou
 	protected static final float[] AIMED_MULT = { 0f, 1.0f, 0.7778f, 0.6778f, 0f };
 
 	protected final ShipAPI boss;
-	protected final Random random = new Random();
+	protected final Random random = newStormRandom();
+
+	public static Random newStormRandom() {
+		long pinned = (long) ArondightQuest.f("arondight_reclaimer_storm_seed", 0f);
+		return pinned == 0L ? new Random() : new Random(pinned);
+	}
 
 	protected int stage = 1;
 	protected int revives = 0;

@@ -15,6 +15,7 @@ import com.fs.starfarer.api.util.Misc;
 import arondight.ArondightStrings;
 import arondight.campaign.ArondightQuest;
 import arondight.campaign.missions.ArondightReclaimerMission;
+import arondight.campaign.missions.ArondightReclaimerWaitScript;
 import arondight.ui.ArondightUi;
 
 public class ArondightBeaconDialog implements InteractionDialogPlugin {
@@ -67,6 +68,11 @@ public class ArondightBeaconDialog implements InteractionDialogPlugin {
 			if (!mission.isMissionCreationAborted()) {
 				mission.accept(dialog, null);
 				arondight.campaign.ArondightSignalIntel.onBeaconAnswered();
+			} else {
+				text.addPara(ArondightStrings.quest("quest_beacon_aborted"));
+				ArondightReclaimerWaitScript again = new ArondightReclaimerWaitScript();
+				Global.getSector().addScript(again);
+				arondight.campaign.ArondightSignalIntel.onLoomWin(again);
 			}
 
 			options.clearOptions();

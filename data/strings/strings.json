@@ -31,6 +31,7 @@
 		"quest_beacon_opt_ledger":"Pull the lattice's maintenance ledger",
 		"quest_beacon_ledger":"The lattice does not hide the entry. Against the reply's timestamp it has filed a single annotation, plain Domain text:",
 		"quest_beacon_reclamation":"RECLAMATION.",
+		"quest_beacon_aborted":"The plot will not close. The lattice holds the channel open and listens.",
 		"quest_beacon_opt_done":"Log the contact and plot the source",
 		"quest_loomwin_1":"The gate ring turns green. Behind you, the course is already going dark.",
 		"quest_loomwin_2":"The station makes no move to take the frame back. The gantry bay's outer doors stand open.",
@@ -70,7 +71,10 @@
 		"console_moved_to_cargo":"Moved to cargo: %s."
 	},
 	"arondight_forms":{
-		"form_header_costs":"First specialization costs 2 story points, second specialization costs 3",
+		"form_header_costs_one_one":"First specialization costs %s story point, second specialization costs %s",
+		"form_header_costs_one_many":"First specialization costs %s story point, second specialization costs %s story points",
+		"form_header_costs_many_one":"First specialization costs %s story points, second specialization costs %s story point",
+		"form_header_costs_many_many":"First specialization costs %s story points, second specialization costs %s",
 		"form_block_current":"This is the frame's current form.",
 		"form_hover_transform":"Click the node to transform.",
 		"form_block_no_frame":"No frame selected.",
@@ -89,7 +93,8 @@
 		"form_moved_flux":"Flux vents and capacitors (cleared)"
 	},
 	"arondight_weave":{
-		"weave_header_cost":"Each weave costs 1 story point",
+		"weave_header_cost_one":"Each weave costs %s story point",
+		"weave_header_cost_many":"Each weave costs %s story points",
 		"weave_header_logistics":"Each weave also adds %s to supplies per month, recovery cost, deployment points.",
 		"weave_invested":"Invested: %s / %s story points",
 		"node_root_name":"Morphogenic Root",
@@ -160,7 +165,8 @@
 		"weave_block_already":"Already woven.",
 		"weave_block_requires":"Requires %s.",
 		"weave_block_capability":"Unavailable: incompatible game version. See starsector.log.",
-		"weave_block_requires_sp":"Requires a story point.",
+		"weave_block_requires_sp_one":"Requires %s story point.",
+		"weave_block_requires_sp_many":"Requires %s story points.",
 		"weave_block_nothing_to_unwind":"Nothing to unwind.",
 		"weave_ledger_wove":"Wove %s",
 		"weave_ledger_unwove":"Unwove the frame",

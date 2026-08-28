@@ -1,3 +1,13 @@
+v1.1.0
+Save compatible. Can be added to existing saves.
+
+- Every form of the ship costs 5-10 less supplies per month, recovery cost and deployment points .
+- With Arma Armatura installed, the mech now launches from one of your carriers instead of the map edge.
+- Added a setting for the supplies per month, recovery cost and deployment points of each additional allocated node.
+- Fixed the Watchdog Remotes drones never shooting at anything.
+- Fixed being locked out of the mech when another fleet destroyed the station's warden drones.
+- Other quest steps also fix themselves the same way.
+
 v1.0.3
 Save compatible. Can be added to existing saves.
 

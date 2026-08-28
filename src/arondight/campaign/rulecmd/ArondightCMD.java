@@ -23,6 +23,9 @@ import arondight.campaign.ArondightBattleResultScript.Kind;
 import arondight.campaign.ArondightFIDPlugin;
 import arondight.campaign.ArondightQuest;
 import arondight.campaign.ArondightSoloBattle;
+import arondight.campaign.missions.ArondightLoomMission;
+import arondight.campaign.missions.ArondightReclaimerMission;
+import arondight.util.ArondightLog;
 
 import static com.fs.starfarer.api.impl.campaign.ids.MemFlags.MEMORY_KEY_NO_SHIP_RECOVERY;
 
@@ -38,9 +41,42 @@ public class ArondightCMD extends BaseCommandPlugin {
 				return startProving(dialog);
 			case "startDuel":
 				return startDuel(dialog);
+			case "ensureWardens":
+				return ensureWardens();
+			case "ensureEscort":
+				return ensureEscort();
 			default:
 				return false;
 		}
+	}
+
+	protected boolean ensureWardens() {
+		Object loom = Global.getSector().getMemoryWithoutUpdate()
+				.get(ArondightLoomMission.GLOBAL_REF);
+		if (loom instanceof ArondightLoomMission) {
+			try {
+				((ArondightLoomMission) loom).ensureWatch();
+			} catch (Exception e) {
+				ArondightLog.warnOnce("ensureWardens",
+						"could not re-post the quarantine watch at the station ("
+						+ e + "); the Loom mission may need the watch restored by hand.");
+			}
+		}
+		return true;
+	}
+
+	protected boolean ensureEscort() {
+		Object rec = Global.getSector().getMemoryWithoutUpdate().get("$arondight_rec_ref");
+		if (rec instanceof ArondightReclaimerMission) {
+			try {
+				((ArondightReclaimerMission) rec).ensureEscort();
+			} catch (Exception e) {
+				ArondightLog.warnOnce("ensureEscort",
+						"could not re-post the Reclamation Escort at the relay ("
+						+ e + "); the Reclaimer mission may need it restored by hand.");
+			}
+		}
+		return true;
 	}
 
 	protected boolean startProving(InteractionDialogAPI dialog) {

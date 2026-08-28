@@ -89,6 +89,7 @@ public final class ArondightIds {
 
     public static final String TAG_APPLIED = "arondight_applied";
     public static final String TAG_WEAVE_PREFIX = "arondight_weave_";
+    public static final String TAG_LOGISTICS_STEP_PREFIX = "arondight_logistics_step_";
 
     public static final String QUEST_FRAME_RECOVERED = "frame_recovered";
     public static final String QUEST_M1_COMPLETE = "m1_complete";

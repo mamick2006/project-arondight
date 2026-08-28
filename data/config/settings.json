@@ -183,6 +183,9 @@
     "arondight_loom_seed": 0,
     "arondight_loom_alpha_min": 1.05,
     "arondight_loom_alpha_max": 2.4,
+    # The storm's ordnance patterns are drawn fresh every fight; seed 0 =
+    # random per battle. A non-zero seed makes the same fight repeat.
+    "arondight_reclaimer_storm_seed": 0,
     # The single hull threshold. Stages III and IV are the two deaths, not
     # hull bands, so this is the only hull edge the fight has.
     "arondight_boss_stage2_hull": 0.50,

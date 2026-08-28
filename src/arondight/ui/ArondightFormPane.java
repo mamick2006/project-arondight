@@ -64,16 +64,30 @@ public final class ArondightFormPane {
     float tileH = TILE_INSET + shipCell + NAME_GAP + NAME_BAND_H + TILE_INSET;
     float formsH = FORMS_HEAD_H + 3f * tileH + 2f * ROW_GAP + BOT_PAD;
 
+    int tier1 = ArondightSettings.tier1SpCost();
+    int tier2 = ArondightSettings.tier2SpCost();
+    int nodeCost = ArondightSettings.nodeSpCost();
     int step = ArondightSettings.weaveLogisticsStep();
     TooltipMakerAPI block = pane.createUIElement(innerW, 110f, false);
-    block.addPara(ArondightStrings.forms("form_header_costs"), ArondightUi.text(), 0f);
-    float meterRowY = block.getHeightSoFar() + LINE_GAP;
-    block.addPara(ArondightStrings.weave("weave_header_cost"), ArondightUi.text(),
-        LINE_GAP);
-    block.addPara(ArondightStrings.weave("weave_header_logistics", step),
-        ArondightUi.text(), LINE_GAP);
+    float gap = 0f;
+    if (tier1 > 0 || tier2 > 0) {
+      block.addPara(formCostLine(tier1, tier2), ArondightUi.text(), gap);
+      gap = LINE_GAP;
+    }
+    float meterRowY = block.getHeightSoFar() + gap;
+    if (nodeCost > 0) {
+      block.addPara(ArondightStrings.weave(
+          nodeCost == 1 ? "weave_header_cost_one" : "weave_header_cost_many", nodeCost),
+          ArondightUi.text(), gap);
+      gap = LINE_GAP;
+    }
+    if (step > 0) {
+      block.addPara(ArondightStrings.weave("weave_header_logistics", step),
+          ArondightUi.text(), gap);
+      gap = LINE_GAP;
+    }
     block.addPara(ArondightStrings.console("console_invest_cap"), ArondightUi.text(),
-        LINE_GAP);
+        gap);
     float blockH = block.getHeightSoFar();
 
     float yCursor = 4f;
@@ -151,6 +165,19 @@ public final class ArondightFormPane {
       addTile(pane, xs[i], ys[i], tileW, tileH, shipCell, forms.get(i),
           member, memberId, current);
     }
+  }
+
+  private static String formCostLine(int tier1, int tier2) {
+    if (tier1 == 1 && tier2 == 1) {
+      return ArondightStrings.forms("form_header_costs_one_one", tier1, tier2);
+    }
+    if (tier1 == 1) {
+      return ArondightStrings.forms("form_header_costs_one_many", tier1, tier2);
+    }
+    if (tier2 == 1) {
+      return ArondightStrings.forms("form_header_costs_many_one", tier1, tier2);
+    }
+    return ArondightStrings.forms("form_header_costs_many_many", tier1, tier2);
   }
 
   private static final String ILLUSTRATION =

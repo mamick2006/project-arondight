@@ -1,6 +1,7 @@
 id,trigger,conditions,script,text,options,notes
 arondightHabWardens,OpenInteractionDialog,"$arondight_habitat
-!$global.arondight_wardensDefeated","ShowDefaultVisual","Your comm board lights with a burst of machine traffic that repeats at exact intervals. It's a docking denial in Domain format, centuries out of code, and the warden drones are already turning your way.","arondightHabLeave:Break off",
+!$global.arondight_wardensDefeated","ShowDefaultVisual
+ArondightCMD ensureWardens","Your comm board lights with a burst of machine traffic repeating at exact intervals. It's a Domain docking denial, centuries old, and warden drones are turning your way.","arondightHabLeave:Break off",
 arondightHabDockFirst,OpenInteractionDialog,"$arondight_habitat
 $global.arondight_wardensDefeated
 !$global.arondight_logsRead
@@ -58,11 +59,13 @@ Call $global.arondight_rec_ref updateStage","The fragments knit into a course un
 
 Before the plot settles, your sensors board cuts in. There are new contacts, machine-pattern, inbound, not answering hails, and not matching the record's mass profile either. Much smaller.","arondightLeave:Return to your ship",
 arondightRelayAgain,OpenInteractionDialog,"$arondight_relay
-$global.arondight_relayScanned","ShowDefaultVisual","The relay's buffer is already yours. The channel it kept open all those years holds nothing else.","arondightLeave:Leave",
+$global.arondight_relayScanned","ShowDefaultVisual
+ArondightCMD ensureEscort","The relay's buffer is already yours.","arondightLeave:Leave",
 ArondightEscortDefeated,ArondightEscortDefeated,"!$global.arondight_escortDefeated","$global.arondight_escortDefeated = true
 Call $global.arondight_rec_ref updateStage","The last of the escort breaks up still in formation. No distress call went out. Nothing out here was listening for one anyway.",,
 arondightStagingEarly,OpenInteractionDialog,"$arondight_staging
-!$global.arondight_escortDefeated","ShowDefaultVisual","The anchorage is cold at this range, and nothing here answers your instruments. Whatever course the relay recorded, it ends here. You are ahead of it.","arondightLeave:Leave",
+!$global.arondight_escortDefeated","ShowDefaultVisual
+ArondightCMD ensureEscort","The anchorage is cold at this range, and nothing here answers your instruments. Whatever course the relay recorded, it ends here.","arondightLeave:Leave",
 arondightStaging,OpenInteractionDialog,"$arondight_staging
 $global.arondight_escortDefeated
 !$global.arondight_m2Done","ShowDefaultVisual","The anchorage is unnamed Domain work: a construction spine and a cold reactor mast, parked in the dark past the last surveyed orbit. Somebody meant to build here once, before the Domain fell.
