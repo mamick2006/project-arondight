@@ -1,14 +1,21 @@
 package arondight.campaign.missions;
 
 import java.awt.Color;
+import java.util.Map;
 import java.util.Random;
 
+import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.FactionAPI;
+import com.fs.starfarer.api.campaign.FactionAPI.ShipPickMode;
 import com.fs.starfarer.api.campaign.FleetAssignment;
+import com.fs.starfarer.api.campaign.InteractionDialogAPI;
 import com.fs.starfarer.api.campaign.LocationAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.StarSystemAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.campaign.rules.MemoryAPI;
+import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.impl.campaign.ids.FleetTypes;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
@@ -24,7 +31,9 @@ import com.fs.starfarer.api.util.Misc;
 import org.lwjgl.util.vector.Vector2f;
 
 import arondight.campaign.ArondightQuest;
+import arondight.balance.WatchBudget;
 import arondight.campaign.ArondightSoloBattle;
+import arondight.campaign.ArondightSurvival;
 
 public class ArondightLoomMission extends HubMissionWithSearch {
 
@@ -83,6 +92,13 @@ public class ArondightLoomMission extends HubMissionWithSearch {
 		return true;
 	}
 
+	@Override
+	protected void endSuccess(InteractionDialogAPI dialog, Map<String, MemoryAPI> memoryMap) {
+		super.endSuccess(dialog, memoryMap);
+		ArondightQuest.set(ArondightQuest.WARDENS_DEFEATED);
+		ArondightQuest.set(ArondightQuest.M1_DONE);
+	}
+
 	public static class SoloRestoreOnAbort implements Abortable {
 		@Override
 		public void abort(HubMission mission, boolean missionOver) {
@@ -127,6 +143,30 @@ public class ArondightLoomMission extends HubMissionWithSearch {
 		fleet.getMemoryWithoutUpdate().set(MemFlags.FLEET_IGNORED_BY_OTHER_FLEETS, true);
 	}
 
+	public static CampaignFleetAPI buildWatchFleet(TriggerActionContext context, Vector2f locInHyper,
+			boolean survival) {
+		CreateFleetAction create = new CreateFleetAction(FleetTypes.PATROL_MEDIUM,
+				locInHyper, FleetSize.MEDIUM, FleetQuality.HIGHER, Factions.DERELICT);
+		create.nameOverride = WATCH_NAME;
+		if (survival) {
+			create.combatFleetPointsOverride = survivalWatchPoints(context);
+		}
+		create.doAction(context);
+		return context.fleet;
+	}
+
+	static float survivalWatchPoints(TriggerActionContext context) {
+		Random random = context.mission instanceof ArondightLoomMission
+				? ((ArondightLoomMission) context.mission).genRandom : null;
+		if (random == null) random = Misc.random;
+		FactionAPI faction = Global.getSector().getFaction(Factions.DERELICT);
+		float maxPoints = faction.getApproximateMaxFPPerFleet(ShipPickMode.PRIORITY_THEN_ALL);
+		float doctrineMult = FleetFactoryV3.getDoctrineNumShipsMult(
+				faction.getDoctrine().getNumShips());
+		return WatchBudget.survivalPoints(random.nextFloat(), doctrineMult, maxPoints,
+				ArondightSurvival.watchFpMult());
+	}
+
 	public static class SpawnWatchAction implements TriggerAction {
 		protected SectorEntityToken habitat;
 
@@ -141,12 +181,8 @@ public class ArondightLoomMission extends HubMissionWithSearch {
 			ArondightLoomMission mission = (ArondightLoomMission) context.mission;
 			mission.ensureGenRandom();
 
-			CreateFleetAction create = new CreateFleetAction(FleetTypes.PATROL_MEDIUM,
-					habitat.getLocationInHyperspace(), FleetSize.MEDIUM,
-					FleetQuality.HIGHER, Factions.DERELICT);
-			create.nameOverride = WATCH_NAME;
-			create.doAction(context);
-			CampaignFleetAPI fleet = context.fleet;
+			CampaignFleetAPI fleet = buildWatchFleet(context, habitat.getLocationInHyperspace(),
+					ArondightSurvival.isSurvivalCampaign());
 			if (fleet == null) return;
 
 			String reason = mission.getReason();
@@ -171,19 +207,6 @@ public class ArondightLoomMission extends HubMissionWithSearch {
 		}
 	}
 
-	public static class HoldAtEntityAction implements TriggerAction {
-		protected SectorEntityToken entity;
-
-		public HoldAtEntityAction(SectorEntityToken entity) {
-			this.entity = entity;
-		}
-
-		@Override
-		public void doAction(TriggerActionContext context) {
-			holdWatchAt(context.fleet, entity, context.mission);
-		}
-	}
-
 	public void ensureWatch() {
 		if (isEnded()) return;
 		ensureGenRandom();
@@ -191,14 +214,10 @@ public class ArondightLoomMission extends HubMissionWithSearch {
 		if (ArondightQuest.gone(habitat)) return;
 		LocationAPI where = habitat.getContainingLocation();
 		if (where == null) return;
-		boolean alive = false;
-		for (CampaignFleetAPI f : where.getFleets()) {
-			if (!f.getMemoryWithoutUpdate().getBoolean(WARDEN_FLEET_FLAG)) continue;
-			alive = true;
-			holdWatchAt(f, habitat, this);
-			hardenWatch(f);
+		if (ArondightQuest.hasLiveFleet(where, WARDEN_FLEET_FLAG)
+				|| currentStage != Stage.DEFEAT_WARDENS) {
+			return;
 		}
-		if (alive || currentStage != Stage.DEFEAT_WARDENS) return;
 		if (ArondightQuest.mem(ArondightQuest.WARDENS_DEFEATED)
 				|| ArondightQuest.mem(ArondightQuest.M1_DONE)) {
 			return;

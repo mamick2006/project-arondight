@@ -44,6 +44,7 @@ public final class ArondightStrings {
     public static String weave(String key) { return get(WEAVE, key); }
     public static String weave(String key, Object... args) { return get(WEAVE, key, args); }
     public static String hullmods(String key) { return get(HULLMODS, key); }
+    public static String hullmods(String key, Object... args) { return get(HULLMODS, key, args); }
     public static String combat(String key) { return get(COMBAT, key); }
 
     private static String fill(String category, String key, String template, Object[] args) {

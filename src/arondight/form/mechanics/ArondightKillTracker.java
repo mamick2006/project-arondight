@@ -12,9 +12,10 @@ import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.util.IntervalUtil;
 
+import arondight.balance.CombatRules;
+
 public class ArondightKillTracker extends BaseEveryFrameCombatPlugin {
 
-    private static final String ENGINE_KEY = "arondight_kills";
     private static final float ATTRIBUTION_WINDOW = 3f;
 
     public interface KillListener {
@@ -22,10 +23,9 @@ public class ArondightKillTracker extends BaseEveryFrameCombatPlugin {
     }
 
     public static ArondightKillTracker get(CombatEngineAPI engine) {
-        Object existing = engine.getCustomData().get(ENGINE_KEY);
+        Object existing = engine.getPluginOfClass(ArondightKillTracker.class);
         if (existing instanceof ArondightKillTracker) return (ArondightKillTracker) existing;
         ArondightKillTracker tracker = new ArondightKillTracker();
-        engine.getCustomData().put(ENGINE_KEY, tracker);
         engine.addPlugin(tracker);
         return tracker;
     }
@@ -41,6 +41,7 @@ public class ArondightKillTracker extends BaseEveryFrameCombatPlugin {
     public void noteDamage(ShipAPI attacker, ShipAPI victim) {
         if (attacker == null || victim == null || !subscribers.containsKey(attacker)) return;
         if (!victim.isAlive() || victim.isHulk()) return;
+        if (!CombatRules.countsAsKill(victim.isFighter(), victim.isDrone())) return;
         Map<ShipAPI, Float> byAttacker = recentDamage.get(victim);
         if (byAttacker == null) {
             byAttacker = new HashMap<>();

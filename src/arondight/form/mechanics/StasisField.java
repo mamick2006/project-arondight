@@ -14,16 +14,14 @@ import com.fs.starfarer.api.util.IntervalUtil;
 
 public class StasisField extends BaseEveryFrameCombatPlugin {
 
-    private static final String ENGINE_KEY = "arondight_stasis";
     private static final Color ICE = new Color(150, 220, 255, 255);
     private static final Color ICE_FAINT = new Color(150, 220, 255, 90);
     private static final Color SLOW_GLOW = new Color(150, 220, 255, 170);
 
     public static StasisField get(CombatEngineAPI engine) {
-        Object existing = engine.getCustomData().get(ENGINE_KEY);
+        Object existing = engine.getPluginOfClass(StasisField.class);
         if (existing instanceof StasisField) return (StasisField) existing;
         StasisField field = new StasisField();
-        engine.getCustomData().put(ENGINE_KEY, field);
         engine.addPlugin(field);
         return field;
     }

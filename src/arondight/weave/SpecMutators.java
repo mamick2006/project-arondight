@@ -186,7 +186,7 @@ public final class SpecMutators {
         }
     }
 
-    public static boolean unhideIfAnimated(ShipHullSpecAPI clone, String slotId, String weaponId) {
+    public static boolean unhideIfUnsafe(ShipHullSpecAPI clone, String slotId, String weaponId) {
         if (clone == null || slotId == null || weaponId == null) return false;
         WeaponSlotAPI target = null;
         WeaponSlotAPI turretDonor = null;
@@ -198,22 +198,69 @@ public final class SpecMutators {
             }
         }
         if (target == null) return false;
-        if (!target.isHidden()) return true;
-        if (!isAnimatedWeapon(weaponId)) return false;
+        if (target.isHidden() && !unsafeOnHiddenMount(weaponId)) return false;
+        boolean hardpoint = unsafeOnTurretMount(weaponId);
+        if (hardpoint ? target.isHardpoint() : target.isTurret()) return true;
         if (!isWorking(CAP_MOUNT)) return false;
+        Object before = null;
         try {
             if (turretDonor == null) {
                 throw new IllegalStateException("no turret-mount donor slot on " + clone.getHullId());
             }
             Object turretType = ArondightReflect.invoke(turretDonor, "getSlotType");
-            ArondightReflect.invoke(target, "setSlotType", turretType);
-            if (target.isHidden()) {
+            before = ArondightReflect.invoke(target, "getSlotType");
+            if (hardpoint) {
+                for (Object type : ((Enum<?>) turretType).getDeclaringClass().getEnumConstants()) {
+                    ArondightReflect.invoke(target, "setSlotType", type);
+                    if (target.isHardpoint()) break;
+                }
+            } else {
+                ArondightReflect.invoke(target, "setSlotType", turretType);
+            }
+            if (hardpoint ? !target.isHardpoint() : !target.isTurret()) {
                 throw new IllegalStateException("setSlotType failed verification on " + slotId);
             }
             return true;
         } catch (Throwable t) {
+            if (before != null) {
+                try {
+                    ArondightReflect.invoke(target, "setSlotType", before);
+                } catch (Throwable ignore) {
+                }
+            }
             markBroken(CAP_MOUNT, t);
             return false;
+        }
+    }
+
+    static boolean unsafeOnHiddenMount(String weaponId) {
+        if (isAnimatedWeapon(weaponId)) return true;
+        com.fs.starfarer.api.loading.WeaponSpecAPI spec = weaponSpec(weaponId);
+        if (spec == null) return false;
+        try {
+            int hidden = Math.min(spec.getHiddenAngleOffsets().size(),
+                    spec.getHiddenFireOffsets().size());
+            return spec.getHardpointFireOffsets().size() > hidden;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    static boolean unsafeOnTurretMount(String weaponId) {
+        com.fs.starfarer.api.loading.WeaponSpecAPI spec = weaponSpec(weaponId);
+        if (spec == null) return false;
+        try {
+            return spec.getTurretFireOffsets().isEmpty();
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    private static com.fs.starfarer.api.loading.WeaponSpecAPI weaponSpec(String weaponId) {
+        try {
+            return com.fs.starfarer.api.Global.getSettings().getWeaponSpec(weaponId);
+        } catch (Throwable t) {
+            return null;
         }
     }
 

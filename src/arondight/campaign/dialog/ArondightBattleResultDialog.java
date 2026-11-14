@@ -10,11 +10,13 @@ import com.fs.starfarer.api.campaign.OptionPanelAPI;
 import com.fs.starfarer.api.campaign.TextPanelAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.combat.EngagementResultAPI;
+import com.fs.starfarer.api.graphics.SpriteAPI;
 import com.fs.starfarer.api.util.Misc;
 
 import arondight.ArondightStrings;
 import arondight.campaign.ArondightBattleResultScript.Kind;
 import arondight.campaign.ArondightQuest;
+import arondight.ui.ArondightUi;
 
 public class ArondightBattleResultDialog implements InteractionDialogPlugin {
 
@@ -60,7 +62,17 @@ public class ArondightBattleResultDialog implements InteractionDialogPlugin {
 		}
 	}
 
+	protected void showPicture(String key) {
+		SpriteAPI picture = ArondightUi.spriteObj("illustrations", key);
+		if (picture != null) {
+			dialog.getVisualPanel().showImagePortion("illustrations", key,
+					picture.getWidth(), picture.getHeight(), 0, 0, 480, 300);
+		}
+	}
+
 	protected void initLoomWin() {
+		showPicture("arondight_frame_hangar");
+
 		text.addPara(ArondightStrings.quest("quest_loomwin_1"));
 
 		text.addPara(ArondightStrings.quest("quest_loomwin_2"));
@@ -78,6 +90,8 @@ public class ArondightBattleResultDialog implements InteractionDialogPlugin {
 	protected void initLoomLoss() {
 		ArondightQuest.unset(ArondightQuest.LOOM_STARTED);
 
+		showPicture("arondight_station_broceliande");
+
 		text.addPara(ArondightStrings.quest("quest_loomloss_1"));
 
 		text.addPara(ArondightStrings.quest("quest_loomloss_2"));
@@ -87,6 +101,8 @@ public class ArondightBattleResultDialog implements InteractionDialogPlugin {
 	}
 
 	protected void initDuelWin() {
+		showPicture("arondight_deep_anchorage");
+
 		text.addPara(ArondightStrings.quest("quest_duelwin_1"));
 
 		text.addPara(ArondightStrings.quest("quest_duelwin_2"));
@@ -104,6 +120,8 @@ public class ArondightBattleResultDialog implements InteractionDialogPlugin {
 
 	protected void initDuelLoss() {
 		ArondightQuest.unset(ArondightQuest.DUEL_STARTED);
+
+		showPicture("arondight_deep_anchorage");
 
 		text.addPara(ArondightStrings.quest("quest_duelloss_1"));
 

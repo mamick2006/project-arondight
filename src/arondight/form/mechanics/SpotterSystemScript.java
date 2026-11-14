@@ -44,7 +44,7 @@ public class SpotterSystemScript extends BaseShipSystemScript {
 
     private float damMult() {
         if (damMult < 0f) {
-            damMult = ArondightSettings.getFloat("arondight_spotter_damage_mult", 1.5f);
+            damMult = ArondightSettings.getFloat("arondight_spotter_damage_mult", 1.3f);
         }
         return damMult;
     }
@@ -124,7 +124,7 @@ public class SpotterSystemScript extends BaseShipSystemScript {
     public StatusData getStatusData(int index, State state, float effectLevel) {
         if (index == 0 && effectLevel > 0 && marked != null) {
             return new StatusData(
-                    (int) ((currDamMult - 1f) * 100f) + "% more damage to target", false);
+                    Math.round((currDamMult - 1f) * 100f) + "% more damage to target", false);
         }
         return null;
     }
@@ -217,7 +217,7 @@ public class SpotterSystemScript extends BaseShipSystemScript {
                 engine.maintainStatusForPlayerShip(KEY_TARGET,
                         source.getSystem().getSpecAPI().getIconSpriteName(),
                         source.getSystem().getDisplayName(),
-                        (int) ((currDamMult - 1f) * 100f) + "% more damage taken", true);
+                        Math.round((currDamMult - 1f) * 100f) + "% more damage taken", true);
             }
 
             String end = null;

@@ -15,8 +15,8 @@
     # Notation is major.minor.patch; trailing zeros are ignored
     "modVersion":
     {
-        "major":1,
-        "minor":1,
+        "major":2,
+        "minor":0,
         "patch":0
     },
 

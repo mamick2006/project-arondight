@@ -1,16 +1,15 @@
 package arondight.topbar;
 
 import java.awt.Color;
+import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.lwjgl.input.Keyboard;
 
@@ -34,6 +33,8 @@ import arondight.ui.ArondightMgmtScreen;
 public class ArondightMgmtInjector implements EveryFrameScript {
 
   static final String HANDSHAKE_KEY = "$mgmt_bar";
+  public static final String OPEN_KEY = "$mgmt_open";
+  public static final String NOTICE_KEY = "$mgmt_notice";
   static final int CONTRACT_VERSION = 2;
   private static final String DK_HOST = "host";
   private static final String DK_VERSION = "version";
@@ -41,10 +42,24 @@ public class ArondightMgmtInjector implements EveryFrameScript {
 
   private static final String MOD_ID = "arondight";
   private static final String SEAM_CLASS = "arondight.topbar.ArondightMgmtInjector";
-  private static final String SHELL_CLASS = "arondight.ui.ArondightMgmtTabShell";
-  private static final String BUTTON_LABEL = "Manage (Y)";
-  private static final String BUTTON_LABEL_NO_KEY = "Manage";
-  private static final Object BUTTON_TAB_ID = "arondight_mgmt_button";
+  private static final String SHELL_NAME = "ArondightMgmtTabShell";
+  private static MethodHandle shellCtorCache;
+  private static final String KEYMAP_PAIR_CLASS = "com.fs.util.container.Pair";
+  private static boolean keymapResolved;
+  private static Class<?> keymapControl;
+  private static Object keymapPairOf;
+  private static MethodHandle keymapSlotOne;
+  private static MethodHandle keymapSlotTwo;
+  private static Class<?> keySlotClass;
+  private static final String RULE_LISTENER = "button listener";
+  private static final String RULE_BAR = "bar";
+  private static final String RULE_CONTROL = "control enum";
+  private static final String RULE_KEYMAP = "keymap class";
+  private static final String RULE_KEYS = "control keys method";
+  private static final String RULE_SLOT = "key slot";
+  private static final Map<String, String> LOOKUPS = new LinkedHashMap<String, String>();
+  private static boolean lookupsLogged;
+  private static final Object BUTTON_TAB_ID = "mgmt_tab";
   private static final String ATTENTION_KEY = "$arondight_mgmt_attention";
   private static final String SELECT_TAB_KEY = "$arondight_select_tab";
 
@@ -65,7 +80,7 @@ public class ArondightMgmtInjector implements EveryFrameScript {
   private static final float PLATE_SRC_PATTERN_X = PLATE_SRC_W - PLATE_W;
   private static final float PLATE_SRC_EDGE_X = PLATE_SRC_W - PLATE_EDGE_W;
 
-  private static final Set<String> MGMT_SCOPE_BINDINGS = new HashSet<String>(Arrays.asList(
+  private static final List<String> MGMT_SCOPE_BINDINGS = Arrays.asList(
       "GENERAL_PAUSE", "GENERAL_SCREENSHOT", "GENERAL_ZOOM_IN", "GENERAL_ZOOM_OUT",
       "GENERAL_TOGGLE_UI", "GENERAL_EXPAND_TOOLTIP", "GENERAL_CODEX", "QUICK_SAVE", "QUICK_LOAD",
       "FAST_FORWARD", "GO_SLOW", "EXIT",
@@ -82,7 +97,7 @@ public class ArondightMgmtInjector implements EveryFrameScript {
       "REFIT_RUNSIM", "REFIT_SAVE", "REFIT_STRIP", "REFIT_UNDO", "REFIT_WEAPON_GROUPS",
       "SUBTAB_1", "SUBTAB_2", "SUBTAB_3", "SUBTAB_4",
       "TAB_0", "TAB_1", "TAB_2", "TAB_3", "TAB_4", "TAB_5", "TAB_6", "TAB_7", "TAB_8", "TAB_9",
-      "TRADE_TAB_MARKET_INFO", "MV_SAVE", "MISSION_REFIT"));
+      "TRADE_TAB_MARKET_INFO", "MV_SAVE", "MISSION_REFIT");
 
   public static final class Tenant {
     public final String modId;
@@ -220,6 +235,8 @@ public class ArondightMgmtInjector implements EveryFrameScript {
   private static volatile Throwable lastErrorForTest;
   private static volatile String queuedSelectModId;
   public static volatile int mgmtDispatchCount;
+  public static volatile String shortcutNotice;
+  public static volatile String attachNotice;
 
   public static boolean isAlive() {
     ArondightMgmtInjector l = live;
@@ -354,7 +371,7 @@ public class ArondightMgmtInjector implements EveryFrameScript {
         return false;
       }
       boolean docked = ui.getCurrentInteractionDialog() != null;
-      UIPanelAPI activeL = docked ? l.dialogCore() : ArondightCoreReflect.getCore();
+      UIPanelAPI activeL = activeCore(ui);
       if (activeL == null) {
         return false;
       }
@@ -393,10 +410,9 @@ public class ArondightMgmtInjector implements EveryFrameScript {
       }
       w = Math.min(w, capW);
       h = Math.min(h, capH);
-      Class<?> shellCls = Class.forName(SHELL_CLASS);
-      Object newShell = MethodHandles.lookup()
-          .findConstructor(shellCls, MethodType.methodType(void.class, float.class, float.class))
-          .invoke(w, h);
+      Object newShell = shellCtor(activeL.getClass()).invoke(w, h);
+      ((UIPanelAPI) newShell).addComponent(ArondightMgmtScreen.stageForShell(newShell, w, h))
+          .inTL(0f, 0f);
       Object m = ArondightCoreReflect.methodNamed(activeL.getClass(), "showPanelAsDialog", 4);
       if (m == null) {
         throw new NoSuchMethodException("arondight: no showPanelAsDialog(button, panel, bl, bl) on"
@@ -416,6 +432,90 @@ public class ArondightMgmtInjector implements EveryFrameScript {
     }
   }
 
+  private static MethodHandle shellCtor(Class<?> coreClass) throws Exception {
+    MethodHandle h = shellCtorCache;
+    if (h == null) {
+      Object show = ArondightCoreReflect.onlyMethodNamed(ArondightMgmtShell.RULE_PANEL, coreClass,
+          "showPanelAsDialog", 4);
+      Class<?> panel = ArondightCoreReflect.paramTypes(show)[1];
+      if (!UIPanelAPI.class.isAssignableFrom(panel)) {
+        throw new ClassCastException(ArondightMgmtShell.ruleFailed(ArondightMgmtShell.RULE_PANEL,
+            panel.getName() + " is not a UIPanelAPI"));
+      }
+      h = ArondightMgmtShell.define(MethodHandles.lookup(), SHELL_NAME, coreClass, panel,
+          ArondightMgmtScreen.class, "onTabClosed");
+      shellCtorCache = h;
+      noteLookup(ArondightMgmtShell.RULE_PANEL, panel.getName());
+      noteLookup(ArondightMgmtShell.RULE_TAB,
+          h.type().returnType().getInterfaces()[0].getName());
+    }
+    return h;
+  }
+
+  private static synchronized void noteLookup(String rule, String found) {
+    LOOKUPS.put(rule, found);
+  }
+
+  public static synchronized List<String> lookupReport() {
+    List<String> lines = new ArrayList<String>();
+    for (Map.Entry<String, String> e : LOOKUPS.entrySet()) {
+      lines.add(e.getKey() + ": " + e.getValue());
+    }
+    return lines;
+  }
+
+  public static List<String> lookupSelfCheck(Class<?> coreClass) throws Throwable {
+    MethodHandle ctor = shellCtor(coreClass);
+    Object shell = ctor.invoke(64f, 64f);
+    Class<?> tab = ctor.type().returnType().getInterfaces()[0];
+    MethodHandles.publicLookup().findVirtual(tab, ArondightMgmtShell.TAB_METHOD,
+        MethodType.methodType(void.class)).invoke(shell);
+    Object buttons = ArondightCoreReflect.onlyMethodNamed(RULE_BAR, coreClass, "getButtons", 0);
+    Class<?> bar = ArondightCoreReflect.returnType(buttons);
+    Object add = ArondightCoreReflect.onlyMethodNamed(RULE_LISTENER, bar, "addButton", 4);
+    Class<?> listener = ArondightCoreReflect.paramTypes(add)[3];
+    try {
+      barListener(listener);
+    } catch (Throwable t) {
+      throw new IllegalStateException(ArondightMgmtShell.ruleFailed(RULE_LISTENER,
+          listener.getName() + " cannot be implemented as the button's listener (" + t + ")"));
+    }
+    noteLookup(RULE_LISTENER, listener.getName());
+    resolveKeymapOn(bar);
+    keymapResolved = true;
+    int read = 0;
+    for (String name : MGMT_SCOPE_BINDINGS) {
+      if (readKeySlots(name) != null) {
+        read++;
+      }
+    }
+    if (keySlotClass == null) {
+      throw new IllegalStateException(ArondightMgmtShell.ruleFailed(RULE_SLOT, "none of the "
+          + MGMT_SCOPE_BINDINGS.size() + " scoped controls holds a key slot to read"));
+    }
+    noteLookup("controls read", read + " of " + MGMT_SCOPE_BINDINGS.size());
+    return lookupReport();
+  }
+
+  private static Object barListener(Class<?> listenerType) throws Throwable {
+    return ArondightCoreReflect.samProxy(listenerType, MethodHandles.lookup().findStatic(
+        ArondightMgmtInjector.class, "onBarButtonClick",
+        MethodType.methodType(void.class, Object.class, Object.class)));
+  }
+
+  private static void logLookupsOnce() {
+    if (lookupsLogged) {
+      return;
+    }
+    lookupsLogged = true;
+    StringBuilder found = new StringBuilder();
+    for (String line : lookupReport()) {
+      found.append(found.length() == 0 ? "" : "; ").append(line);
+    }
+    Global.getLogger(ArondightMgmtInjector.class).info("Project Arondight: the Manage button is on the"
+        + " bar. Found on this game build: " + found + ".");
+  }
+
   public static boolean dismissCore(Object coreL) {
     if (coreL == null) {
       return false;
@@ -429,6 +529,21 @@ public class ArondightMgmtInjector implements EveryFrameScript {
       return true;
     } catch (Throwable ignore) {
       return false;
+    }
+  }
+
+  public static void noteScreenOpen(boolean open) {
+    try {
+      if (Global.getSector() == null) {
+        return;
+      }
+      MemoryAPI mem = Global.getSector().getMemoryWithoutUpdate();
+      if (open) {
+        mem.set(OPEN_KEY, Boolean.TRUE);
+      } else {
+        mem.unset(OPEN_KEY);
+      }
+    } catch (Throwable ignore) {
     }
   }
 
@@ -470,7 +585,16 @@ public class ArondightMgmtInjector implements EveryFrameScript {
     releaseMgmtConsole();
     queuedSelectModId = null;
     mgmtDispatchCount = 0;
+    shortcutNotice = null;
+    attachNotice = null;
     live = null;
+    noteScreenOpen(false);
+    try {
+      if (Global.getSector() != null) {
+        Global.getSector().getMemoryWithoutUpdate().unset(NOTICE_KEY);
+      }
+    } catch (Throwable ignore) {
+    }
   }
 
   private static final class BarSlot {
@@ -480,6 +604,8 @@ public class ArondightMgmtInjector implements EveryFrameScript {
     CustomPanelAPI plate;
     boolean proxyFailed;
     boolean flashOn;
+    boolean shortcutOn;
+    float faceX;
   }
 
   private final IntervalUtil interval = new IntervalUtil(0.15f, 0.25f);
@@ -491,6 +617,8 @@ public class ArondightMgmtInjector implements EveryFrameScript {
   private boolean registeredWithHost;
   private boolean hostSeamAlive;
   private int locateFails;
+  private int shortcutKey = -1;
+  private boolean menuWasShowing;
 
   public ArondightMgmtInjector() {
     live = this;
@@ -498,6 +626,8 @@ public class ArondightMgmtInjector implements EveryFrameScript {
     if (Global.getSector() != null) {
       Global.getSector().getMemoryWithoutUpdate().unset(SELECT_TAB_KEY);
       Global.getSector().getMemoryWithoutUpdate().unset(HANDSHAKE_KEY);
+      Global.getSector().getMemoryWithoutUpdate().unset(OPEN_KEY);
+      Global.getSector().getMemoryWithoutUpdate().unset(NOTICE_KEY);
     }
   }
 
@@ -567,9 +697,18 @@ public class ArondightMgmtInjector implements EveryFrameScript {
   }
 
   private void hostTick(MemoryAPI mem) throws Exception {
-    boolean docked = Global.getSector().getCampaignUI() != null
-        && Global.getSector().getCampaignUI().getCurrentInteractionDialog() != null;
-    UIPanelAPI activeL = docked ? dialogCore() : ArondightCoreReflect.getCore();
+    CampaignUIAPI ui = Global.getSector().getCampaignUI();
+    if (ui != null) {
+      boolean menu = ui.isShowingMenu();
+      boolean dialog = ui.isShowingDialog();
+      boolean due = ArondightMgmtKey.recheckDue(menuWasShowing, menu, dialog);
+      menuWasShowing = ArondightMgmtKey.menuSeen(menuWasShowing, menu, dialog);
+      if (due) {
+        recheckShortcut();
+      }
+    }
+    boolean docked = ui != null && ui.getCurrentInteractionDialog() != null;
+    UIPanelAPI activeL = ui == null ? null : activeCore(ui);
     if (activeL == null) {
       locateFails = 0;
       return;
@@ -581,7 +720,7 @@ public class ArondightMgmtInjector implements EveryFrameScript {
       clearSlot(slot);
     }
     boolean present = slot.bar != null && slot.button != null && slot.hostL == activeL
-        && ArondightCoreReflect.isChild(slot.bar, slot.button);
+        && slot.button.getParent() == slot.bar;
     if (!present) {
       clearSlot(slot);
       UIPanelAPI found = locateBar(activeL);
@@ -655,28 +794,18 @@ public class ArondightMgmtInjector implements EveryFrameScript {
 
   private transient boolean declinedLogged;
 
-  private UIPanelAPI dialogCore() throws Exception {
-    CampaignUIAPI ui = Global.getSector() == null ? null : Global.getSector().getCampaignUI();
-    if (ui == null || ui.getCurrentInteractionDialog() == null) {
-      return null;
+  private static UIPanelAPI activeCore(CampaignUIAPI ui) throws Exception {
+    UIPanelAPI core = (UIPanelAPI) ui.getCore2();
+    if (core == null || ui.getCurrentInteractionDialog() == null) {
+      return core;
     }
-    Object m = ArondightCoreReflect.methodNamed(ui.getClass(), "getEncounterDialog", 0);
-    Object dlg = m == null ? null : ArondightCoreReflect.invokeMethod(m, ui, new Object[0]);
-    if (dlg == null) {
-      return null;
-    }
-    Object m2 = ArondightCoreReflect.methodNamed(dlg.getClass(), "getCoreUI", 0);
-    Object core = m2 == null ? null : ArondightCoreReflect.invokeMethod(m2, dlg, new Object[0]);
-    return core instanceof UIPanelAPI ? (UIPanelAPI) core : null;
+    return core == ArondightCoreReflect.getCore() ? null : core;
   }
 
   private UIPanelAPI resolveActiveLQuiet() {
     try {
       CampaignUIAPI ui = Global.getSector() == null ? null : Global.getSector().getCampaignUI();
-      if (ui == null) {
-        return null;
-      }
-      return ui.getCurrentInteractionDialog() != null ? dialogCore() : ArondightCoreReflect.getCore();
+      return ui == null ? null : activeCore(ui);
     } catch (Throwable t) {
       return null;
     }
@@ -712,11 +841,12 @@ public class ArondightMgmtInjector implements EveryFrameScript {
     if (panel == null || depth < 0) {
       return null;
     }
-    if (looksLikeBar(panel)
+    List<UIComponentAPI> children = panel.getChildrenCopy2();
+    if (looksLikeBar(children)
         && ArondightCoreReflect.methodNamed(panel.getClass(), "addButton", 4) != null) {
       return panel;
     }
-    for (Object child : ArondightCoreReflect.childrenList(panel)) {
+    for (UIComponentAPI child : children) {
       if (child instanceof UIPanelAPI) {
         UIPanelAPI found = searchBar((UIPanelAPI) child, depth - 1);
         if (found != null) {
@@ -727,40 +857,32 @@ public class ArondightMgmtInjector implements EveryFrameScript {
     return null;
   }
 
-  private boolean looksLikeBar(UIPanelAPI p) throws Exception {
+  private static boolean looksLikeBar(List<UIComponentAPI> children) {
     int n = 0;
-    for (Object child : ArondightCoreReflect.childrenList(p)) {
-      if (!(child instanceof ButtonAPI) || !(child instanceof UIComponentAPI)) {
-        continue;
-      }
-      PositionAPI pos = ((UIComponentAPI) child).getPosition();
-      if (pos == null) {
-        continue;
-      }
-      float w = pos.getWidth();
-      float h = pos.getHeight();
-      if (w >= BAR_BTN_W_MIN && w <= BAR_BTN_W_MAX && h >= BAR_BTN_H_MIN && h <= BAR_BTN_H_MAX) {
+    for (UIComponentAPI child : children) {
+      if (child instanceof ButtonAPI && isRecipeButton(child.getPosition())) {
         n++;
       }
     }
     return n >= MIN_BAR_BUTTONS;
   }
 
-  private static float rightmostButtonRightLocal(UIPanelAPI bar) throws Exception {
+  private static boolean isRecipeButton(PositionAPI pos) {
+    if (pos == null) {
+      return false;
+    }
+    float w = pos.getWidth();
+    float h = pos.getHeight();
+    return w >= BAR_BTN_W_MIN && w <= BAR_BTN_W_MAX && h >= BAR_BTN_H_MIN && h <= BAR_BTN_H_MAX;
+  }
+
+  private static float rightmostButtonRightLocal(UIPanelAPI bar) {
     PositionAPI barPos = bar.getPosition();
     float best = -1f;
-    for (Object child : ArondightCoreReflect.childrenList(bar)) {
-      if (!(child instanceof ButtonAPI) || !(child instanceof UIComponentAPI)) {
-        continue;
-      }
-      PositionAPI pos = ((UIComponentAPI) child).getPosition();
-      if (pos == null) {
-        continue;
-      }
-      float w = pos.getWidth();
-      float h = pos.getHeight();
-      if (w >= BAR_BTN_W_MIN && w <= BAR_BTN_W_MAX && h >= BAR_BTN_H_MIN && h <= BAR_BTN_H_MAX) {
-        best = Math.max(best, pos.getX() + w);
+    for (UIComponentAPI child : bar.getChildrenCopy2()) {
+      PositionAPI pos = child.getPosition();
+      if (child instanceof ButtonAPI && isRecipeButton(pos)) {
+        best = Math.max(best, pos.getX() + pos.getWidth());
       }
     }
     if (best < 0f || barPos == null) {
@@ -773,25 +895,27 @@ public class ArondightMgmtInjector implements EveryFrameScript {
 
   private void inject(BarSlot slot, UIPanelAPI activeL, UIPanelAPI foundBar) throws Exception {
     injectCount++;
+    shellCtor(activeL.getClass());
     float prevRight = rightmostButtonRightLocal(foundBar);
 
     slot.plate = Global.getSettings().createCustom(PLATE_W, PLATE_H, new PlatePlugin());
     foundBar.addComponent(slot.plate).inBL(prevRight, 0f);
 
-    Object m = ArondightCoreReflect.methodNamed(foundBar.getClass(), "addButton", 4);
-    if (m == null) {
-      throw new NoSuchMethodException("arondight: bar lost its addButton shape between match and"
-          + " inject");
+    Object m = ArondightCoreReflect.onlyMethodNamed(RULE_LISTENER, foundBar.getClass(),
+        "addButton", 4);
+    if (shortcutKey < 0) {
+      shortcutKey = readShortcutKey();
     }
-    boolean keyCollides = mgmtScopeKeyInUse(m, Keyboard.KEY_Y);
-    String label = keyCollides ? BUTTON_LABEL_NO_KEY : BUTTON_LABEL;
+    String keyName = shortcutKeyName();
+    String keyOwner = keyName == null ? null : mgmtScopeBindingOn(keyName);
+    boolean withShortcut = keyName != null && keyOwner == null;
+    String label = ArondightMgmtKey.label(withShortcut ? keyName : null);
     Class<?>[] pts = ArondightCoreReflect.paramTypes(m);
     Object listener;
     try {
-      listener = ArondightCoreReflect.samProxy(pts[3], MethodHandles.lookup().findStatic(
-          ArondightMgmtInjector.class, "onBarButtonClick",
-          MethodType.methodType(void.class, Object.class, Object.class)));
+      listener = barListener(pts[3]);
       slot.proxyFailed = false;
+      noteLookup(RULE_LISTENER, pts[3].getName());
     } catch (Throwable t) {
       listener = null;
       slot.proxyFailed = true;
@@ -806,41 +930,267 @@ public class ArondightMgmtInjector implements EveryFrameScript {
     slot.button = (ButtonAPI) btn;
     slot.bar = foundBar;
     slot.hostL = activeL;
+    slot.faceX = prevRight + BUTTON_PAD;
+    slot.shortcutOn = withShortcut;
 
-    if (keyCollides) {
-      Global.getLogger(ArondightMgmtInjector.class).info("Project Arondight: the player keymap"
-          + " binds Y to a campaign- or core-screen-scope control, so the Manage button ships"
-          + " without its shortcut this session; the button stays fully clickable.");
-    } else {
-      slot.button.setShortcut(Keyboard.KEY_Y, false);
+    if (keyOwner != null) {
+      logKeyCollision(keyName, keyOwner);
+    } else if (withShortcut) {
+      slot.button.setShortcut(shortcutKey, false);
+      slot.button.setText(ArondightMgmtKey.labelMarkup(keyName));
     }
 
     if (slot.button.getPosition() != null) {
-      slot.button.getPosition().inBL(prevRight + BUTTON_PAD, 4f);
+      slot.button.getPosition().inBL(slot.faceX, 4f);
+    }
+    logLookupsOnce();
+  }
+
+  private void recheckShortcut() {
+    String keyName = shortcutKey < 0 ? null : shortcutKeyName();
+    if (keyName == null) {
+      return;
+    }
+    String keyOwner = mgmtScopeBindingOn(keyName);
+    boolean on = keyOwner == null;
+    boolean changed = applyShortcut(campaignSlot, keyName, on);
+    changed |= applyShortcut(dockedSlot, keyName, on);
+    if (changed && keyOwner != null) {
+      logKeyCollision(keyName, keyOwner);
     }
   }
 
-  private static boolean mgmtScopeKeyInUse(Object addButtonMethod, int keyCode) {
-    try {
-      Class<?>[] pts = ArondightCoreReflect.paramTypes(addButtonMethod);
-      Object[] constants = pts[2].getEnumConstants();
-      if (constants == null) {
-        return false;
-      }
-      for (Object c : constants) {
-        if (!(c instanceof Enum) || !MGMT_SCOPE_BINDINGS.contains(((Enum<?>) c).name())) {
-          continue;
-        }
-        for (Integer v : ArondightCoreReflect.instanceIntFieldValues(c)) {
-          if (v != null && v.intValue() == keyCode) {
-            return true;
-          }
-        }
-      }
-      return false;
-    } catch (Throwable t) {
+  private boolean applyShortcut(BarSlot slot, String keyName, boolean on) {
+    if (slot.button == null || slot.shortcutOn == on) {
       return false;
     }
+    if (on) {
+      String label = ArondightMgmtKey.label(keyName);
+      slot.button.setText(label);
+      slot.button.setShortcut(shortcutKey, false);
+      slot.button.setText(ArondightMgmtKey.labelMarkup(keyName));
+    } else {
+      slot.button.setShortcut(-1, false);
+      slot.button.setText(ArondightMgmtKey.labelMarkup(null));
+    }
+    slot.shortcutOn = on;
+    if (slot.button.getPosition() != null) {
+      slot.button.getPosition().inBL(slot.faceX, 4f);
+    }
+    return true;
+  }
+
+  private static int readShortcutKey() {
+    String[][] settings = ArondightMgmtKey.SETTINGS;
+    Integer[] values = new Integer[settings.length];
+    for (int i = 0; i < settings.length; i++) {
+      values[i] = readKeySetting(settings[i][0], settings[i][1]);
+    }
+    return ArondightMgmtKey.resolve(values);
+  }
+
+  private static Integer readKeySetting(String modId, String fieldId) {
+    try {
+      if (!Global.getSettings().getModManager().isModEnabled(modId)) {
+        return null;
+      }
+      if (Global.getSettings().getModManager().isModEnabled("lunalib")) {
+        Integer v = lunalib.lunaSettings.LunaSettings.getInt(modId, fieldId);
+        if (v != null) {
+          return v;
+        }
+      }
+      return Integer.valueOf(Global.getSettings().getInt(fieldId));
+    } catch (Throwable t) {
+      return null;
+    }
+  }
+
+  private String shortcutKeyName() {
+    return keyName(shortcutKey);
+  }
+
+  private static String keyName(int code) {
+    String lwjglName;
+    try {
+      lwjglName = Keyboard.getKeyName(code);
+    } catch (Throwable t) {
+      lwjglName = null;
+    }
+    return ArondightMgmtKey.gameKeyName(code, lwjglName);
+  }
+
+  private static void logKeyCollision(String keyName, String keyOwner) {
+    String why = " the player keymap binds " + keyName + " to " + keyOwner + ", a campaign-map or"
+        + " core-screen control, so the Manage button has no keyboard shortcut.";
+    Global.getLogger(ArondightMgmtInjector.class).info("Project Arondight:" + why);
+    postShortcutNotice(keyName);
+  }
+
+  private static void postShortcutNotice(String keyName) {
+    if (shortcutNotice != null) {
+      return;
+    }
+    try {
+      String text = String.format(
+          Global.getSettings().getString("arondight_mgmt_bar", "shortcut_key_in_use"), keyName);
+      Global.getSector().getCampaignUI().addMessage(text);
+      shortcutNotice = text;
+    } catch (Throwable ignore) {
+    }
+  }
+
+  private static void postAttachNotice() {
+    try {
+      MemoryAPI mem = Global.getSector().getMemoryWithoutUpdate();
+      if (handshakePresent() || mem.get(NOTICE_KEY) != null) {
+        return;
+      }
+      String text = Global.getSettings().getString("arondight_mgmt_bar", "button_not_added");
+      Global.getSector().getCampaignUI().addMessage(text);
+      mem.set(NOTICE_KEY, Boolean.TRUE);
+      attachNotice = text;
+    } catch (Throwable ignore) {
+    }
+  }
+
+  public static String mgmtScopeBindingOn(String keyName) {
+    if (keyName == null) {
+      return null;
+    }
+    for (String name : MGMT_SCOPE_BINDINGS) {
+      String[] slots = keySlots(name);
+      if (slots != null && (keyName.equals(slots[0]) || keyName.equals(slots[1]))) {
+        return name;
+      }
+    }
+    return null;
+  }
+
+  private static String[] keySlots(String binding) {
+    resolveKeymap();
+    if (keymapPairOf != null) {
+      try {
+        return readKeySlots(binding);
+      } catch (Throwable t) {
+        keymapPairOf = null;
+        logKeymapFallback(t);
+      }
+    }
+    try {
+      return new String[] { Global.getSettings().getControlStringForEnumName(binding), null };
+    } catch (Throwable t) {
+      return null;
+    }
+  }
+
+  private static String[] readKeySlots(String binding) throws Throwable {
+    Object control;
+    try {
+      control = enumConstant(keymapControl, binding);
+    } catch (IllegalArgumentException absent) {
+      return null;
+    }
+    Object pair = ArondightCoreReflect.invokeMethod(keymapPairOf, null, new Object[] { control });
+    if (pair == null) {
+      return new String[] { null, null };
+    }
+    return new String[] { slotName(keymapSlotOne.invoke(pair)),
+        slotName(keymapSlotTwo.invoke(pair)) };
+  }
+
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  private static Object enumConstant(Class<?> enumClass, String name) {
+    return Enum.valueOf((Class) enumClass, name);
+  }
+
+  private static String slotName(Object slot) throws Exception {
+    if (slot == null) {
+      return null;
+    }
+    List<Object> codes = ArondightCoreReflect.fieldValuesOfType(slot, int.class);
+    if (codes.size() != 1) {
+      throw new IllegalStateException(ArondightMgmtShell.ruleFailed(RULE_SLOT,
+          slot.getClass().getName() + " has " + codes.size() + " int fields, and exactly one,"
+              + " the key code, is needed"));
+    }
+    if (slot.getClass() != keySlotClass) {
+      keySlotClass = slot.getClass();
+      noteLookup(RULE_SLOT, keySlotClass.getName());
+    }
+    int code = ((Integer) codes.get(0)).intValue();
+    String name = code < 1 ? null : keyName(code);
+    if (name == null) {
+      return null;
+    }
+    for (Object held : ArondightCoreReflect.fieldValuesOfType(slot, boolean.class)) {
+      if (Boolean.TRUE.equals(held)) {
+        return "Mod-" + name;
+      }
+    }
+    return name;
+  }
+
+  private static void resolveKeymap() {
+    if (keymapResolved) {
+      return;
+    }
+    Object core;
+    try {
+      core = Global.getSector().getCampaignUI().getCore2();
+    } catch (Throwable t) {
+      core = null;
+    }
+    if (core == null) {
+      return;
+    }
+    keymapResolved = true;
+    try {
+      Object bar = ArondightCoreReflect.invokeNoArg("getButtons", core);
+      if (bar == null) {
+        throw new IllegalStateException(ArondightMgmtShell.ruleFailed(RULE_BAR,
+            "the core UI's getButtons() returned no bar"));
+      }
+      resolveKeymapOn(bar.getClass());
+    } catch (Throwable t) {
+      keymapPairOf = null;
+      logKeymapFallback(t);
+    }
+  }
+
+  private static void resolveKeymapOn(Class<?> barClass) throws Exception {
+    Object add = ArondightCoreReflect.onlyMethodNamed(RULE_CONTROL, barClass, "addButton", 4);
+    Class<?> control = ArondightCoreReflect.paramTypes(add)[2];
+    if (!control.isEnum()) {
+      throw new IllegalStateException(ArondightMgmtShell.ruleFailed(RULE_CONTROL,
+          "the bar's shortcut parameter " + control.getName() + " is not an enum"));
+    }
+    Class<?> controls = control.getEnclosingClass();
+    if (controls == null) {
+      throw new IllegalStateException(ArondightMgmtShell.ruleFailed(RULE_KEYMAP,
+          "the control enum " + control.getName() + " is not nested in a class"));
+    }
+    Class<?> pair = Class.forName(KEYMAP_PAIR_CLASS);
+    Object pairOf = ArondightCoreReflect.methodBySignature(controls, pair, control);
+    if (pairOf == null) {
+      throw new NoSuchMethodException(ArondightMgmtShell.ruleFailed(RULE_KEYS, controls.getName()
+          + " has no method, or several, that takes a control and returns a "
+          + pair.getSimpleName() + ", and exactly one is needed"));
+    }
+    MethodHandles.Lookup lookup = MethodHandles.lookup();
+    keymapSlotOne = lookup.findGetter(pair, "one", Object.class);
+    keymapSlotTwo = lookup.findGetter(pair, "two", Object.class);
+    keymapControl = control;
+    keymapPairOf = pairOf;
+    noteLookup(RULE_CONTROL, control.getName());
+    noteLookup(RULE_KEYMAP, controls.getName());
+    noteLookup(RULE_KEYS, ArondightCoreReflect.methodName(pairOf));
+  }
+
+  private static void logKeymapFallback(Throwable t) {
+    String why = " could not read the keymap's second keys (" + t + "), so the Manage shortcut"
+        + " check reads one key per control.";
+    Global.getLogger(ArondightMgmtInjector.class).info("Project Arondight:" + why);
   }
 
   private static final class PlatePlugin extends BaseCustomUIPanelPlugin {
@@ -938,6 +1288,8 @@ public class ArondightMgmtInjector implements EveryFrameScript {
     slot.plate = null;
     slot.proxyFailed = false;
     slot.flashOn = false;
+    slot.shortcutOn = false;
+    slot.faceX = 0f;
   }
 
   private void giveUpIfStuck() {
@@ -1009,6 +1361,7 @@ public class ArondightMgmtInjector implements EveryFrameScript {
 
   private void disableForSession() {
     dead = true;
+    postAttachNotice();
     try {
       arondight.ui.ArondightIntel.ensureExists();
     } catch (Throwable ignore) {

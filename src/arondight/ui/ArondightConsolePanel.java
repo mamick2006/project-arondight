@@ -17,6 +17,7 @@ import com.fs.starfarer.api.ui.PositionAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 
 import arondight.state.ArondightState;
+import arondight.weave.ArondightUndo;
 
 public final class ArondightConsolePanel implements CustomUIPanelPlugin {
 
@@ -35,6 +36,7 @@ public final class ArondightConsolePanel implements CustomUIPanelPlugin {
     this.height = height;
     this.root = Global.getSettings().createCustom(width, height, this);
     live = this;
+    ArondightUndo.clear();
     rebuild();
   }
 
@@ -52,13 +54,17 @@ public final class ArondightConsolePanel implements CustomUIPanelPlugin {
     if (console != null && live == console) {
       live = null;
       ArondightWeavePane.dropLiveScroller();
+      ArondightReadouts.dropLive();
+      ArondightUndo.clear();
     }
   }
 
   public static void resetStaticsForLoad() {
     live = null;
+    ArondightUndo.clear();
     ArondightFormPane.resetStaticsForLoad();
     ArondightWeavePane.dropLiveScroller();
+    ArondightReadouts.dropLive();
   }
 
   public CustomPanelAPI getPanel() {

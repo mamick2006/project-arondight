@@ -6,15 +6,17 @@ import com.fs.starfarer.api.campaign.CoreUITabId;
 import com.fs.starfarer.api.campaign.InteractionDialogAPI;
 import com.fs.starfarer.api.campaign.listeners.ColonyInteractionListener;
 import com.fs.starfarer.api.campaign.listeners.CoreUITabListener;
+import com.fs.starfarer.api.campaign.listeners.DModRepairListener;
 import com.fs.starfarer.api.campaign.listeners.EconomyTickListener;
 import com.fs.starfarer.api.campaign.listeners.ShipRecoveryListener;
 import com.fs.starfarer.api.campaign.PlayerMarketTransaction;
+import com.fs.starfarer.api.combat.ShipVariantAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 
 import arondight.state.ArondightState;
 
 public class WeaveReapplyHooks implements CoreUITabListener, ShipRecoveryListener,
-        ColonyInteractionListener, EconomyTickListener {
+        ColonyInteractionListener, EconomyTickListener, DModRepairListener {
 
     @Override
     public void reportAboutToOpenCoreTab(CoreUITabId id, Object param) {
@@ -50,4 +52,9 @@ public class WeaveReapplyHooks implements CoreUITabListener, ShipRecoveryListene
 
     @Override
     public void reportEconomyMonthEnd() {}
+
+    @Override
+    public void reportDModsRepaired(FleetMemberAPI member, ShipVariantAPI variant, int parts) {
+        WeaveApplier.applyForRepairedDHull(member, variant);
+    }
 }

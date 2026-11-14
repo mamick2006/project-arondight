@@ -75,6 +75,7 @@ public final class ArondightMgmtScreen {
     staged = null;
     s.hostL = hostL;
     live = s;
+    ArondightMgmtInjector.noteScreenOpen(true);
     s.applyInitialSelect();
   }
 
@@ -95,6 +96,7 @@ public final class ArondightMgmtScreen {
       return;
     }
     live = null;
+    ArondightMgmtInjector.noteScreenOpen(false);
     try {
       ArondightMgmtInjector.releaseTenantConsole(s.selectedModId);
     } catch (Throwable ignore) {

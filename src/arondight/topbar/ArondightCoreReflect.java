@@ -5,6 +5,7 @@ import java.lang.invoke.MethodHandleProxies;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +13,6 @@ import java.util.Map;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignUIAPI;
 import com.fs.starfarer.api.campaign.SectorAPI;
-import com.fs.starfarer.api.ui.UIComponentAPI;
 import com.fs.starfarer.api.ui.UIPanelAPI;
 
 final class ArondightCoreReflect {
@@ -24,14 +24,15 @@ final class ArondightCoreReflect {
   private static final MethodHandle FIELD_GET_NAME;
   private static final MethodHandle FIELD_SET_ACCESSIBLE;
   private static final MethodHandle FIELD_GET;
-  private static final MethodHandle FIELD_GET_MODIFIERS;
   private static final MethodHandle GET_DECLARED_METHODS;
   private static final MethodHandle METHOD_GET_NAME;
   private static final MethodHandle METHOD_GET_PARAM_COUNT;
   private static final MethodHandle METHOD_GET_PARAM_TYPES;
   private static final MethodHandle METHOD_SET_ACCESSIBLE;
   private static final MethodHandle METHOD_INVOKE;
-  private static final MethodHandle MODIFIER_IS_STATIC;
+  private static final MethodHandle FIELD_GET_TYPE;
+  private static final MethodHandle FIELD_GET_MODIFIERS;
+  private static final MethodHandle METHOD_GET_RETURN_TYPE;
 
   static {
     try {
@@ -41,14 +42,12 @@ final class ArondightCoreReflect {
       Class<?> fieldArr = Class.forName("[Ljava.lang.reflect.Field;", false, sys);
       Class<?> methodCls = Class.forName("java.lang.reflect.Method", false, sys);
       Class<?> methodArr = Class.forName("[Ljava.lang.reflect.Method;", false, sys);
-      Class<?> modifierCls = Class.forName("java.lang.reflect.Modifier", false, sys);
       GET_DECLARED_FIELDS = lookup.findVirtual(Class.class, "getDeclaredFields",
           MethodType.methodType(fieldArr));
       FIELD_GET_NAME = lookup.findVirtual(fieldCls, "getName", MethodType.methodType(String.class));
       FIELD_SET_ACCESSIBLE = lookup.findVirtual(fieldCls, "setAccessible",
           MethodType.methodType(void.class, boolean.class));
       FIELD_GET = lookup.findVirtual(fieldCls, "get", MethodType.methodType(Object.class, Object.class));
-      FIELD_GET_MODIFIERS = lookup.findVirtual(fieldCls, "getModifiers", MethodType.methodType(int.class));
       GET_DECLARED_METHODS = lookup.findVirtual(Class.class, "getDeclaredMethods",
           MethodType.methodType(methodArr));
       METHOD_GET_NAME = lookup.findVirtual(methodCls, "getName", MethodType.methodType(String.class));
@@ -60,8 +59,12 @@ final class ArondightCoreReflect {
           MethodType.methodType(void.class, boolean.class));
       METHOD_INVOKE = lookup.findVirtual(methodCls, "invoke",
           MethodType.methodType(Object.class, Object.class, Object[].class));
-      MODIFIER_IS_STATIC = lookup.findStatic(modifierCls, "isStatic",
-          MethodType.methodType(boolean.class, int.class));
+      FIELD_GET_TYPE = lookup.findVirtual(fieldCls, "getType",
+          MethodType.methodType(Class.class));
+      FIELD_GET_MODIFIERS = lookup.findVirtual(fieldCls, "getModifiers",
+          MethodType.methodType(int.class));
+      METHOD_GET_RETURN_TYPE = lookup.findVirtual(methodCls, "getReturnType",
+          MethodType.methodType(Class.class));
     } catch (Throwable t) {
       throw new RuntimeException("arondight: core-tab reflection bootstrap failed", t);
     }
@@ -69,12 +72,9 @@ final class ArondightCoreReflect {
 
   private static Object coreField;
   private static Class<?> coreFieldClass;
-  private static Object childrenMethod;
-  private static Class<?> childrenClass;
 
   private static final Object METHOD_ABSENT = new Object();
   private static final Map<String, Object> METHOD_CACHE = new HashMap<String, Object>();
-  private static Class<?> campaignEngineClass;
 
   static UIPanelAPI getCore() throws Exception {
     SectorAPI sector = Global.getSector();
@@ -96,55 +96,6 @@ final class ArondightCoreReflect {
       return null;
     }
     return (UIPanelAPI) core;
-  }
-
-  static UIPanelAPI getHostCore() throws Exception {
-    SectorAPI sector = Global.getSector();
-    if (sector == null) {
-      return null;
-    }
-    CampaignUIAPI ui = sector.getCampaignUI();
-    if (ui == null) {
-      return null;
-    }
-    Object dialog = invokeNoArgOrNull("getEncounterDialog", ui);
-    if (dialog != null) {
-      Object dialogCore = invokeNoArgOrNull("getCoreUI", dialog);
-      if (dialogCore instanceof UIPanelAPI) {
-        return (UIPanelAPI) dialogCore;
-      }
-    }
-    return getCore();
-  }
-
-  static boolean isChild(UIPanelAPI core, UIComponentAPI panel) throws Exception {
-    if (core == null || panel == null) {
-      return false;
-    }
-    for (Object child : childrenList(core)) {
-      if (child == panel) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  static List<?> childrenList(UIPanelAPI panel) throws Exception {
-    if (panel == null) {
-      return java.util.Collections.emptyList();
-    }
-    Object m = childrenMethodFor(panel.getClass());
-    Object result;
-    try {
-      result = METHOD_INVOKE.invoke(m, panel, new Object[0]);
-    } catch (Throwable t) {
-      throw asException(t);
-    }
-    if (!(result instanceof List)) {
-      throw new NoSuchMethodException("arondight: children accessor returned "
-          + (result == null ? "null" : result.getClass().getName()) + ", not a List");
-    }
-    return (List<?>) result;
   }
 
   static Object getCurrentTab(UIPanelAPI core) throws Exception {
@@ -184,62 +135,6 @@ final class ArondightCoreReflect {
     }
   }
 
-  private static Object invokeNoArgOrNull(String name, Object target) throws Exception {
-    if (target == null) {
-      return null;
-    }
-    Object m = findMethodCached(target.getClass(), name, 0);
-    if (m == null) {
-      return null;
-    }
-    try {
-      return METHOD_INVOKE.invoke(m, target, new Object[0]);
-    } catch (Throwable t) {
-      throw asException(t);
-    }
-  }
-
-  static Object intelTabData() throws Exception {
-    if (campaignEngineClass == null) {
-      campaignEngineClass = Class.forName("com.fs.starfarer.campaign.CampaignEngine");
-    }
-    Object getInstance = findMethodCached(campaignEngineClass, "getInstance", 0);
-    if (getInstance == null) {
-      throw new NoSuchMethodException("arondight: CampaignEngine.getInstance() not found");
-    }
-    Object engine;
-    try {
-      engine = METHOD_INVOKE.invoke(getInstance, null, new Object[0]);
-    } catch (Throwable t) {
-      throw asException(t);
-    }
-    if (engine == null) {
-      return null;
-    }
-    Object uiData = invokeNoArg("getUIData", engine);
-    if (uiData == null) {
-      return null;
-    }
-    return invokeNoArg("getIntelData", uiData);
-  }
-
-  static int getSelectedTabIndex() throws Exception {
-    Object itd = intelTabData();
-    if (itd == null) {
-      return -1;
-    }
-    Object r = invokeNoArg("getSelectedTabIndex", itd);
-    return r instanceof Integer ? ((Integer) r).intValue() : -1;
-  }
-
-  static void setSelectedTabIndex(int index) throws Exception {
-    Object itd = intelTabData();
-    if (itd == null) {
-      return;
-    }
-    invokeOneArg("setSelectedTabIndex", itd, Integer.valueOf(index));
-  }
-
   private static Object coreFieldFor(Class<?> cls) throws Exception {
     if (coreField != null && coreFieldClass == cls) {
       return coreField;
@@ -251,22 +146,6 @@ final class ArondightCoreReflect {
     coreField = f;
     coreFieldClass = cls;
     return f;
-  }
-
-  private static Object childrenMethodFor(Class<?> cls) throws Exception {
-    if (childrenMethod != null && childrenClass == cls) {
-      return childrenMethod;
-    }
-    Object m = findMethod(cls, "getChildrenNonCopy");
-    if (m == null) {
-      m = findMethod(cls, "getChildrenCopy");
-    }
-    if (m == null) {
-      throw new NoSuchMethodException("arondight: no children accessor on " + cls.getName());
-    }
-    childrenMethod = m;
-    childrenClass = cls;
-    return m;
   }
 
   private static Object findField(Class<?> cls, String name) throws Exception {
@@ -284,10 +163,6 @@ final class ArondightCoreReflect {
     } catch (Throwable t) {
       throw asException(t);
     }
-  }
-
-  private static Object findMethod(Class<?> cls, String name) throws Exception {
-    return findMethod(cls, name, 0);
   }
 
   private static Object findMethod(Class<?> cls, String name, int paramCount) throws Exception {
@@ -346,27 +221,92 @@ final class ArondightCoreReflect {
     return MethodHandleProxies.asInterfaceInstance(iface.asSubclass(Object.class), impl);
   }
 
-  static List<Integer> instanceIntFieldValues(Object target) throws Exception {
-    List<Integer> out = new ArrayList<Integer>();
-    if (target == null) {
-      return out;
-    }
+  static Object methodBySignature(Class<?> owner, Class<?> returns, Class<?>... params)
+      throws Exception {
     try {
-      for (Class<?> c = target.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-        Object[] fields = (Object[]) GET_DECLARED_FIELDS.invoke(c);
-        for (Object f : fields) {
-          int mods = (int) FIELD_GET_MODIFIERS.invoke(f);
-          if ((boolean) MODIFIER_IS_STATIC.invoke(mods)) {
+      Object found = null;
+      for (Object m : (Object[]) GET_DECLARED_METHODS.invoke(owner)) {
+        if ((Class<?>) METHOD_GET_RETURN_TYPE.invoke(m) != returns
+            || !Arrays.equals((Class<?>[]) METHOD_GET_PARAM_TYPES.invoke(m), params)) {
+          continue;
+        }
+        if (found != null) {
+          return null;
+        }
+        found = m;
+      }
+      if (found != null) {
+        METHOD_SET_ACCESSIBLE.invoke(found, true);
+      }
+      return found;
+    } catch (Throwable t) {
+      throw asException(t);
+    }
+  }
+
+  static Object onlyMethodNamed(String rule, Class<?> cls, String name, int paramCount)
+      throws Exception {
+    Object found = null;
+    Class<?>[] shape = null;
+    try {
+      for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
+        for (Object m : (Object[]) GET_DECLARED_METHODS.invoke(c)) {
+          if (!name.equals(METHOD_GET_NAME.invoke(m))
+              || (int) METHOD_GET_PARAM_COUNT.invoke(m) != paramCount) {
             continue;
           }
-          FIELD_SET_ACCESSIBLE.invoke(f, true);
-          Object v = FIELD_GET.invoke(f, target);
-          if (v instanceof Integer) {
-            out.add((Integer) v);
+          Class<?>[] params = (Class<?>[]) METHOD_GET_PARAM_TYPES.invoke(m);
+          if (found == null) {
+            found = m;
+            shape = params;
+          } else if (!Arrays.equals(shape, params)) {
+            throw new NoSuchMethodException("Manage lookup '" + rule + "' failed: "
+                + cls.getName() + " has several " + name + " methods with " + paramCount
+                + " parameters, " + Arrays.toString(shape) + " and " + Arrays.toString(params)
+                + ", and exactly one is needed. The game's core UI changed shape.");
           }
         }
       }
-      return out;
+      if (found == null) {
+        throw new NoSuchMethodException("Manage lookup '" + rule + "' failed: " + cls.getName()
+            + " has no " + name + " method with " + paramCount + " parameters. The game's core"
+            + " UI changed shape.");
+      }
+      METHOD_SET_ACCESSIBLE.invoke(found, true);
+      return found;
+    } catch (Throwable t) {
+      throw asException(t);
+    }
+  }
+
+  static Class<?> returnType(Object method) throws Exception {
+    try {
+      return (Class<?>) METHOD_GET_RETURN_TYPE.invoke(method);
+    } catch (Throwable t) {
+      throw asException(t);
+    }
+  }
+
+  static String methodName(Object method) throws Exception {
+    try {
+      return (String) METHOD_GET_NAME.invoke(method);
+    } catch (Throwable t) {
+      throw asException(t);
+    }
+  }
+
+  static List<Object> fieldValuesOfType(Object target, Class<?> type) throws Exception {
+    List<Object> values = new ArrayList<Object>();
+    try {
+      for (Object f : (Object[]) GET_DECLARED_FIELDS.invoke(target.getClass())) {
+        if ((Class<?>) FIELD_GET_TYPE.invoke(f) != type
+            || ((int) FIELD_GET_MODIFIERS.invoke(f) & 0x0008) != 0) {
+          continue;
+        }
+        FIELD_SET_ACCESSIBLE.invoke(f, true);
+        values.add(FIELD_GET.invoke(f, target));
+      }
+      return values;
     } catch (Throwable t) {
       throw asException(t);
     }

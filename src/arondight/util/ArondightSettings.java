@@ -28,11 +28,8 @@ public final class ArondightSettings {
     }
 
     public static float getFloat(String key, float fallback) {
-        try {
-            return Global.getSettings().getFloat(key);
-        } catch (Exception e) {
-            return fallback;
-        }
+        if (Global.getSettings() == null) return fallback;
+        return Global.getSettings().optFloat(key, fallback);
     }
 
     public static int getInt(String key, int fallback) {
@@ -40,11 +37,8 @@ public final class ArondightSettings {
             Integer luna = LunaSettings.getInt(MOD_ID, key);
             if (luna != null) return luna;
         }
-        try {
-            return Global.getSettings().getInt(key);
-        } catch (Exception e) {
-            return fallback;
-        }
+        if (Global.getSettings() == null) return fallback;
+        return (int) Global.getSettings().optFloat(key, fallback);
     }
 
     public static boolean getBoolean(String key, boolean fallback) {
@@ -52,7 +46,8 @@ public final class ArondightSettings {
             Boolean luna = LunaSettings.getBoolean(MOD_ID, key);
             if (luna != null) return luna;
         }
-        return fallback;
+        if (Global.getSettings() == null) return fallback;
+        return Global.getSettings().optBoolean(key, fallback);
     }
 
     public static String getString(String key, String fallback) {
@@ -62,6 +57,14 @@ public final class ArondightSettings {
         } catch (Exception e) {
             return fallback;
         }
+    }
+
+    public static float loomBodyRadiusFraction() {
+        return getFloat("arondight_loom_body_radius_fraction", 0.6f);
+    }
+
+    public static boolean skipProving() {
+        return getBoolean("arondight_skip_proving", false);
     }
 
     private static Float nodeBonusXp;
@@ -105,11 +108,6 @@ public final class ArondightSettings {
         return tier2BonusXp;
     }
 
-    @Deprecated
-    public static int weaveCap() {
-        return getInt(ArondightIds.SET_WEAVE_CAP, 12);
-    }
-
     static final int LOGISTICS_STEP_MIN = 0;
     static final int LOGISTICS_STEP_MAX = 3;
 
@@ -121,6 +119,6 @@ public final class ArondightSettings {
     }
 
     public static int weaveLogisticsStep() {
-        return clampLogisticsStep(getInt(ArondightIds.SET_WEAVE_LOGISTICS_STEP, 2));
+        return clampLogisticsStep(getInt(ArondightIds.SET_WEAVE_LOGISTICS_STEP, 1));
     }
 }

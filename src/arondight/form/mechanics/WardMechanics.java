@@ -20,6 +20,7 @@ import com.fs.starfarer.api.combat.listeners.AdvanceableListener;
 import com.fs.starfarer.api.combat.listeners.DamageTakenModifier;
 import com.fs.starfarer.api.plugins.ShipSystemStatsScript.State;
 
+import arondight.balance.CombatRules;
 import arondight.util.ArondightSettings;
 
 public class WardMechanics implements AdvanceableListener, DamageTakenModifier {
@@ -186,18 +187,12 @@ public class WardMechanics implements AdvanceableListener, DamageTakenModifier {
     }
 
     private float reflectFractionForHit() {
-        switch (variant) {
-            case DURENDAL:
-                return ArondightSettings.getFloat("arondight_ward_reflect", 0.5f);
-            case FLASH:
-                boolean perfect = activeTime <= ArondightSettings.getFloat("arondight_ward_perfect_window", 0.15f);
-                return perfect
-                        ? ArondightSettings.getFloat("arondight_ward_perfect_reflect", 2f)
-                        : ArondightSettings.getFloat("arondight_ward_sloppy_reflect", 0.25f);
-            case BULWARK:
-            default:
-                return 0f;
-        }
+        boolean flash = variant == Variant.FLASH;
+        return CombatRules.wardReflectFraction(flash,
+                flash && activeTime <= ArondightSettings.getFloat("arondight_ward_perfect_window", 0.15f),
+                ArondightSettings.getFloat("arondight_ward_reflect", 0.5f),
+                ArondightSettings.getFloat("arondight_ward_perfect_reflect", 2f),
+                ArondightSettings.getFloat("arondight_ward_sloppy_reflect", 0.25f));
     }
 
     private void spawnReflectArc(ShipAPI attacker, Vector2f from, float arcDamage, boolean perfect) {

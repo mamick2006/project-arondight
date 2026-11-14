@@ -27,6 +27,7 @@ import com.fs.starfarer.api.combat.listeners.HullDamageAboutToBeTakenListener;
 import com.fs.starfarer.api.util.IntervalUtil;
 
 import arondight.ArondightIds;
+import arondight.balance.LatticeBalance;
 import arondight.form.mechanics.ArondightKillTracker;
 import arondight.form.mechanics.WardMechanics;
 import arondight.util.ArondightSettings;
@@ -53,10 +54,12 @@ public class LatticeCombatPlugin implements AdvanceableListener, DamageTakenModi
     private final String modId;
     private final boolean loom, actuators, drones, selfWeave, afterimage, bleed, harvest, buffer;
 
-    private final IntervalUtil slowInterval = new IntervalUtil(0.4f, 0.6f);
+    private final IntervalUtil slowInterval =
+            new IntervalUtil(LatticeBalance.SLOW_TICK_MIN, LatticeBalance.SLOW_TICK_MAX);
     private final IntervalUtil loomInterval = new IntervalUtil(0.9f, 1.1f);
 
     private boolean initialized = false;
+    private ArondightKillTracker kills;
     private List<WeaponAPI> missileWeapons;
     private float loomAmmoCarry = 0f;
     private float selfWeaveBudget = 0f;
@@ -118,7 +121,8 @@ public class LatticeCombatPlugin implements AdvanceableListener, DamageTakenModi
 
     private void init(CombatEngineAPI engine) {
         if (harvest) {
-            ArondightKillTracker.get(engine).subscribe(ship, this);
+            kills = ArondightKillTracker.get(engine);
+            kills.subscribe(ship, this);
         }
         if (loom) {
             missileWeapons = new ArrayList<>();
@@ -227,7 +231,7 @@ public class LatticeCombatPlugin implements AdvanceableListener, DamageTakenModi
 
     private void bleedTick(CombatEngineAPI engine) {
         float range = ArondightSettings.getFloat("arondight_bleed_range", 500f);
-        float damage = ArondightSettings.getFloat("arondight_bleed_damage", 60f);
+        float damage = ArondightSettings.getFloat("arondight_bleed_damage", 110f);
         ShipAPI target = nearestEnemy(engine, range);
         if (target == null) {
             noteBleed("bleed:no-target-in-" + (int) range);
@@ -322,7 +326,7 @@ public class LatticeCombatPlugin implements AdvanceableListener, DamageTakenModi
         if (!buffer || shieldHit || target != ship) return null;
         WardMechanics ward = WardMechanics.of(ship);
         if (ward != null && ward.isWardActive()) return null;
-        float fraction = ArondightSettings.getFloat("arondight_buffer_fraction", 0.15f);
+        float fraction = ArondightSettings.getFloat("arondight_buffer_fraction", 0.25f);
         ship.getFluxTracker().increaseFlux(damage.getDamage() * fraction, false);
         damage.getModifier().modifyMult(modId, 1f - fraction);
         return modId;
@@ -331,8 +335,8 @@ public class LatticeCombatPlugin implements AdvanceableListener, DamageTakenModi
     @Override
     public String modifyDamageDealt(Object param, CombatEntityAPI target, DamageAPI damage,
                                     Vector2f point, boolean shieldHit) {
-        if (harvest && target instanceof ShipAPI && Global.getCombatEngine() != null) {
-            ArondightKillTracker.get(Global.getCombatEngine()).noteDamage(ship, (ShipAPI) target);
+        if (harvest && target instanceof ShipAPI && kills != null) {
+            kills.noteDamage(ship, (ShipAPI) target);
         }
         if (!actuators) return null;
         WeaponAPI weapon = weaponOf(param);
@@ -357,7 +361,10 @@ public class LatticeCombatPlugin implements AdvanceableListener, DamageTakenModi
         if (damageAmount < ship.getMaxHitpoints() * threshold) return false;
 
         float dist = ArondightSettings.getFloat("arondight_afterimage_dist", 250f);
-        double rad = Math.toRadians(ship.getFacing());
+        Vector2f loc = ship.getLocation();
+        Vector2f from = point != null ? point : loc;
+        double rad = Math.toRadians(LatticeBalance.blinkHeading(ship.getVelocity().x,
+                ship.getVelocity().y, loc.x, loc.y, from.x, from.y, ship.getFacing()));
         Vector2f dest = new Vector2f(ship.getLocation().x + (float) (dist * Math.cos(rad)),
                 ship.getLocation().y + (float) (dist * Math.sin(rad)));
 

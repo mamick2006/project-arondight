@@ -20,9 +20,9 @@ import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import arondight.ArondightIds;
 import arondight.ArondightStrings;
 import arondight.form.ArondightTransformer;
-import arondight.state.ArondightBudget;
 import arondight.state.ArondightState;
 import arondight.util.ArondightLog;
+import arondight.util.ArondightReflect;
 import arondight.util.ArondightSettings;
 import arondight.weave.ArondightWeave;
 
@@ -30,19 +30,9 @@ public final class ArondightFormPane {
 
   public static final String BTN_TRANSFORM_PREFIX = "arondight_btn_transform_";
 
-  private static final float PAD = 10f;
-  private static final float GAP = 6f;
-  private static final float TILE_W_MAX = 130f;
-  private static final float TILE_INSET = 6f;
-  private static final float NAME_GAP = 4f;
-  private static final float NAME_BAND_H = 28f;
   private static final float SHIP_NUDGE_LEFT = 7f;
-  private static final float BOT_PAD = 20f;
-  private static final float ROW_GAP = 22f;
-  private static final float SECTION_GAP = 10f;
-  private static final float FORMS_HEAD_H = 30f;
-  private static final float LINE_GAP = 3f;
-  private static final float ILL_MIN_H = 60f;
+  private static final float NAME_OVERHANG = 3f;
+  private static final float NAME_RAISE = 3f;
 
   private ArondightFormPane() {
   }
@@ -51,97 +41,44 @@ public final class ArondightFormPane {
     return ArondightTransformer.getFormDisplayName(formId);
   }
 
-  public static void add(CustomPanelAPI host, float x, float w, float h,
-      FleetMemberAPI member, String memberId) {
+  public static void add(CustomPanelAPI host, ArondightFrame f, FleetMemberAPI member,
+      String memberId) {
     ArondightGraphLayer graph = new ArondightGraphLayer();
-    CustomPanelAPI pane = host.createCustomPanel(w, h, graph);
-    host.addComponent(pane).inTL(x, 0f);
+    CustomPanelAPI pane = host.createCustomPanel(f.leftW, f.height, graph);
+    host.addComponent(pane).inTL(0f, 0f);
 
-    float innerW = w - 2f * PAD;
+    SpriteAPI ill = illustration();
+    if (ill != null && ill.getHeight() > 0f) {
+      float[] r = f.pictureRect(ill.getWidth() / ill.getHeight());
+      TooltipMakerAPI illEl = pane.createUIElement(r[2], r[3], false);
+      illEl.addImage(ILLUSTRATION, r[2], r[3], 0f);
+      pane.addUIElement(illEl).inTL(r[0] - ArondightUi.INSET, r[1]);
+    }
+    ArondightReadouts.add(pane, f, member, memberId);
 
-    float tileW = Math.min(TILE_W_MAX, (w - 2f * PAD - 5f * GAP) / 6f);
-    float shipCell = tileW - 2f * TILE_INSET;
-    float tileH = TILE_INSET + shipCell + NAME_GAP + NAME_BAND_H + TILE_INSET;
-    float formsH = FORMS_HEAD_H + 3f * tileH + 2f * ROW_GAP + BOT_PAD;
-
+    TooltipMakerAPI head = pane.createUIElement(f.leftW, ArondightFrame.HEAD_H, false);
+    head.addSectionHeading("Forms", Alignment.MID, 0f);
+    pane.addUIElement(head).inTL(0f, f.formsHeadY);
     int tier1 = ArondightSettings.tier1SpCost();
     int tier2 = ArondightSettings.tier2SpCost();
-    int nodeCost = ArondightSettings.nodeSpCost();
-    int step = ArondightSettings.weaveLogisticsStep();
-    TooltipMakerAPI block = pane.createUIElement(innerW, 110f, false);
-    float gap = 0f;
     if (tier1 > 0 || tier2 > 0) {
-      block.addPara(formCostLine(tier1, tier2), ArondightUi.text(), gap);
-      gap = LINE_GAP;
-    }
-    float meterRowY = block.getHeightSoFar() + gap;
-    if (nodeCost > 0) {
-      block.addPara(ArondightStrings.weave(
-          nodeCost == 1 ? "weave_header_cost_one" : "weave_header_cost_many", nodeCost),
-          ArondightUi.text(), gap);
-      gap = LINE_GAP;
-    }
-    if (step > 0) {
-      block.addPara(ArondightStrings.weave("weave_header_logistics", step),
-          ArondightUi.text(), gap);
-      gap = LINE_GAP;
-    }
-    block.addPara(ArondightStrings.console("console_invest_cap"), ArondightUi.text(),
-        gap);
-    float blockH = block.getHeightSoFar();
-
-    float yCursor = 4f;
-    SpriteAPI ill = illustration();
-    float illAvail = h - yCursor - blockH - formsH - 2f * SECTION_GAP;
-    if (ill != null && ill.getHeight() > 0f && illAvail >= ILL_MIN_H) {
-      float aspect = ill.getWidth() / ill.getHeight();
-      float illH = Math.min(illAvail, innerW / aspect);
-      float illW = illH * aspect;
-      TooltipMakerAPI illEl = pane.createUIElement(illW, illH, false);
-      illEl.addImage(ILLUSTRATION, illW, illH, 0f);
-      pane.addUIElement(illEl).inTL((w - illW) / 2f, yCursor);
-      yCursor += illH + SECTION_GAP;
+      TooltipMakerAPI cost = pane.createUIElement(f.leftW + 2f * ArondightUi.INSET, 18f,
+          false);
+      cost.addPara(formCostLine(tier1, tier2), ArondightUi.text(), 0f);
+      pane.addUIElement(cost).inTL(-ArondightUi.INSET, f.formsCostY);
     }
 
-    pane.addUIElement(block).inTL(PAD, yCursor);
-
-    int invested = memberId == null ? 0 : ArondightBudget.getInvestedSp(memberId);
-    int budget = ArondightBudget.getBudget();
-    TooltipMakerAPI meter = pane.createUIElement(w * 0.4f, 20f, false);
-    LabelAPI meterLbl = ArondightUi.addHlPara(meter,
-        ArondightStrings.weave("weave_invested", invested, budget), 0f,
-        "" + invested, "" + budget);
-    meterLbl.setAlignment(Alignment.RMID);
-    meterLbl.setHighlightColor(ArondightUi.story());
-    pane.addUIElement(meter).inTR(PAD, yCursor + meterRowY);
-    yCursor += blockH + SECTION_GAP;
-
-    TooltipMakerAPI head = pane.createUIElement(innerW, 24f, false);
-    head.addSectionHeading("Forms", Alignment.MID, 0f);
-    pane.addUIElement(head).inTL(PAD, yCursor);
     String current = memberId == null ? null : ArondightState.getCurrentForm(memberId);
-
-    float y0 = yCursor + FORMS_HEAD_H;
-    float rowGap = ROW_GAP;
-    float gridW = 6f * tileW + 5f * GAP;
-    float x0 = Math.max(PAD, (w - gridW) / 2f);
+    float tileW = f.tileW;
+    float tileH = f.tileH;
+    float rowGap = ArondightFrame.ROW_GAP;
     List<String> forms = ArondightTransformer.getAllForms();
 
     float[] xs = new float[10];
     float[] ys = new float[10];
-    xs[0] = (w - tileW) / 2f;
-    ys[0] = y0;
-    float y1 = y0 + tileH + rowGap;
-    for (int i = 0; i < 3; i++) {
-      float pairLeft = x0 + (2 * i) * (tileW + GAP);
-      float pairW = 2f * tileW + GAP;
-      xs[1 + i] = pairLeft + (pairW - tileW) / 2f;
-      ys[1 + i] = y1;
-    }
-    float y2 = y1 + tileH + rowGap;
-    for (int i = 0; i < 6; i++) {
-      xs[4 + i] = x0 + i * (tileW + GAP);
-      ys[4 + i] = y2;
+    for (int i = 0; i < 10; i++) {
+      xs[i] = f.tileX(i);
+      ys[i] = f.tileY(i);
     }
 
     for (int parent = 0; parent < 4; parent++) {
@@ -162,8 +99,18 @@ public final class ArondightFormPane {
       }
     }
     for (int i = 0; i < 10; i++) {
-      addTile(pane, xs[i], ys[i], tileW, tileH, shipCell, forms.get(i),
-          member, memberId, current);
+      addTile(pane, xs[i], ys[i], f, forms.get(i), member, memberId, current);
+    }
+
+    if (!ArondightState.areTreesUnlocked()) {
+      CustomPanelAPI ground = pane.createCustomPanel(f.gridW, ArondightFrame.SEALED_H,
+          new ArondightDimLayer(ArondightDimLayer.SEALED));
+      pane.addComponent(ground).inTL(f.gridX, f.sealedY());
+      TooltipMakerAPI line = pane.createUIElement(f.gridW, ArondightFrame.SEALED_H, false);
+      LabelAPI sentence = line.addPara(ArondightStrings.console("console_sealed_band"),
+          ArondightUi.warn(), 2f);
+      sentence.setAlignment(Alignment.MID);
+      pane.addUIElement(line).inTL(f.gridX, f.sealedY());
     }
   }
 
@@ -212,9 +159,11 @@ public final class ArondightFormPane {
     return new Color(70, 78, 82);
   }
 
-  private static void addTile(CustomPanelAPI pane, float x, float y, float tw, float th,
-      float shipCell, String formId, FleetMemberAPI member, String memberId,
-      String currentFormId) {
+  private static void addTile(CustomPanelAPI pane, float x, float y, ArondightFrame f,
+      String formId, FleetMemberAPI member, String memberId, String currentFormId) {
+    float tw = f.tileW;
+    float th = f.tileH;
+    float bandH = ArondightFrame.TILE_TOP + f.picture;
     boolean isCurrent = formId.equals(currentFormId);
 
     ArondightTransformer.FormSelectState sel =
@@ -232,32 +181,33 @@ public final class ArondightFormPane {
 
     String name = formName(formId);
 
-    addShipRender(tile, TILE_INSET - SHIP_NUDGE_LEFT, TILE_INSET, shipCell, formId);
+    float cell = f.shipCell;
+    addShipRender(tile, (tw - cell) / 2f - SHIP_NUDGE_LEFT,
+        ArondightFrame.TILE_TOP + f.picture / 2f - cell / 2f, cell, formId);
 
-    TooltipMakerAPI nameEl = tile.createUIElement(tw, NAME_BAND_H, false);
-    nameEl.setParaFont("graphics/fonts/victor10.fnt");
-    LabelAPI nameLbl = nameEl.addPara(name, 2f);
+    float nameMax = tw + 2f * NAME_OVERHANG;
+    float nameInk = Math.min(nameMax, ArondightUi.textWidth(tile, null, name));
+    float nameW = Math.max(tw, (float) Math.ceil(nameInk) + 2f * ArondightUi.INSET
+        + ArondightUi.LINE_SLACK);
+    TooltipMakerAPI nameEl = tile.createUIElement(nameW, ArondightFrame.NAME_H, false);
+    LabelAPI nameLbl = nameEl.addPara(name, 1f);
     nameLbl.setAlignment(Alignment.MID);
     nameLbl.setColor(isCurrent ? ArondightUi.good()
         : dimmed ? ArondightUi.gray() : ArondightUi.text());
-    if (name.indexOf(' ') < 0) {
-      fitLabelToOneLine(nameLbl, name, tw - 14f);
-    }
-    nameEl.setParaFontDefault();
-    tile.addUIElement(nameEl).inTL(0f, TILE_INSET + shipCell + NAME_GAP);
+    fitLabelToOneLine(nameLbl, name, nameMax);
+    tile.addUIElement(nameEl).inTL((tw - nameW) / 2f, bandH - NAME_RAISE);
 
     if (dimmed) {
-      CustomPanelAPI dim = tile.createCustomPanel(tw, th, new ArondightDimLayer());
+      CustomPanelAPI dim = tile.createCustomPanel(tw, bandH, new ArondightDimLayer());
       tile.addComponent(dim).inTL(0f, 0f);
     }
 
     TooltipMakerAPI overlay = tile.createUIElement(tw, th, false);
-    ButtonAPI hit = overlay.addButton("",
-        verbData != null ? verbData : "arondight_btn_noop_" + formId,
-        ArondightUi.CLEAR, ArondightUi.CLEAR, Alignment.MID, null, tw, th, 0f);
+    ButtonAPI hit = ArondightUi.addInvisibleButton(overlay,
+        verbData != null ? verbData : "arondight_btn_noop_" + formId, tw, th);
     ArondightUi.setEnabledSayingWhy(hit, actionable);
     FleetMemberAPI tipMember = isCurrent && member != null ? member
-        : tooltipMember(formId, memberId);
+        : tooltipMember(formId, memberId, member);
     boolean attached = false;
     if (tipMember != null) {
       attached = ArondightShipTooltips.attachExpanded(hit, tipMember,
@@ -267,7 +217,7 @@ public final class ArondightFormPane {
       overlay.addTooltipToPrevious(fallbackTip(formId, tipMember),
           TooltipMakerAPI.TooltipLocation.BELOW, false);
     }
-    tile.addUIElement(overlay).inTL(0f, 0f);
+    tile.addUIElement(overlay).inTL(-ArondightUi.INSET, 0f);
   }
 
   private static ArondightShipTooltips.TipNote tipNote(final String formId) {
@@ -341,7 +291,8 @@ public final class ArondightFormPane {
     TOOLTIP_MEMBERS.clear();
   }
 
-  private static FleetMemberAPI tooltipMember(String formId, String memberId) {
+  private static FleetMemberAPI tooltipMember(String formId, String memberId,
+      FleetMemberAPI live) {
     FleetMemberAPI m = TOOLTIP_MEMBERS.get(formId);
     if (m == null) {
       try {
@@ -368,9 +319,21 @@ public final class ArondightFormPane {
         ArondightWeave.applyNodesToVariant(m.getVariant(), woven);
       }
       m.updateStats();
+      crewPreview(m, live);
     } catch (Throwable ignore) {
     }
     return m;
+  }
+
+  private static void crewPreview(FleetMemberAPI m, FleetMemberAPI live) {
+    try {
+      m.getCrewComposition().setCrew(Math.max(1f, m.getMinCrew()));
+      float cr = live != null ? live.getRepairTracker().getCR()
+          : m.getRepairTracker().getMaxCR();
+      m.getRepairTracker().setCR(cr);
+      m.updateStats();
+    } catch (Throwable ignore) {
+    }
   }
 
   private static FleetMemberAPI displayMember(String formId) {
@@ -396,22 +359,18 @@ public final class ArondightFormPane {
 
   private static void addShipRender(CustomPanelAPI tile, float x, float y, float cell,
       String formId) {
-    float renderCell = cell >= 96f ? 96f : cell >= 48f ? 48f : cell;
-    x += (cell - renderCell) / 2f;
-    y += (cell - renderCell) / 2f;
-    CustomPanelAPI box = tile.createCustomPanel(renderCell, renderCell, null);
+    CustomPanelAPI box = tile.createCustomPanel(cell, cell, null);
     FleetMemberAPI m = displayMember(formId);
     if (m != null) {
       java.util.List<FleetMemberAPI> one = new java.util.ArrayList<FleetMemberAPI>(1);
       one.add(m);
-      TooltipMakerAPI ship = box.createUIElement(renderCell, renderCell, false);
-      ship.addShipList(1, 1, renderCell, ArondightUi.alpha(ArondightUi.dark(), 0), one,
-          0f);
+      TooltipMakerAPI ship = box.createUIElement(cell, cell, false);
+      ship.addShipList(1, 1, cell, ArondightUi.alpha(ArondightUi.dark(), 0), one, 0f);
+      silenceShipCell(ship);
       box.addUIElement(ship).inTL(0f, 0f);
     } else {
-      TooltipMakerAPI ph = box.createUIElement(renderCell, renderCell, false);
-      LabelAPI l = ph.addPara("[ hull", ArondightUi.gray(),
-          Math.max(0f, renderCell / 2f - 18f));
+      TooltipMakerAPI ph = box.createUIElement(cell, cell, false);
+      LabelAPI l = ph.addPara("[ hull", ArondightUi.gray(), Math.max(0f, cell / 2f - 18f));
       l.setAlignment(Alignment.MID);
       LabelAPI l2 = ph.addPara("pending ]", ArondightUi.gray(), 1f);
       l2.setAlignment(Alignment.MID);
@@ -420,12 +379,26 @@ public final class ArondightFormPane {
     tile.addComponent(box).inTL(x, y);
   }
 
+  private static void silenceShipCell(TooltipMakerAPI ship) {
+    try {
+      Object list = ArondightReflect.invoke(ship.getPrev(), "getList");
+      Object items = ArondightReflect.invoke(list, "getItems");
+      for (Object item : (Iterable<?>) items) {
+        ArondightReflect.invoke(item, "setTooltip", 0f, null);
+      }
+    } catch (Throwable t) {
+      ArondightLog.warnOnce("form_tile_cell_tooltip", "the form tiles' ship cells kept"
+          + " the engine's own tooltip (" + t + "), likely a rename in a game update; a"
+          + " tile's ship picture may open a plain ship tooltip just outside its frame");
+    }
+  }
+
   private static ArondightUi.Tip fallbackTip(final String formId,
       final FleetMemberAPI tipMember) {
     final ArondightShipTooltips.TipNote note = tipNote(formId);
     return new ArondightUi.Tip() {
       @Override
-      public void createTooltip(TooltipMakerAPI t, boolean expanded, Object param) {
+      public void fill(TooltipMakerAPI t, boolean expanded, Object param) {
         t.addTitle(formName(formId));
         String line = note.text();
         if (line != null) {

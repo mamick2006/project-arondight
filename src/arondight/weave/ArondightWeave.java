@@ -18,11 +18,6 @@ public final class ArondightWeave {
         return ArondightNodes.byId(nodeId);
     }
 
-    @Deprecated
-    public static int getWeaveCap() {
-        return ArondightNodes.weaveCap();
-    }
-
     public enum Quadrant {
         NW("Frame"), NE("System"), SE("Hardpoints"), SW("Lattice");
 
@@ -72,38 +67,12 @@ public final class ArondightWeave {
         return WeaveActions.getWeaveBlockReason(member, nodeId);
     }
 
-    public static String getRespecBlockReason(FleetMemberAPI member) {
-        return WeaveActions.getRespecBlockReason(member);
-    }
-
-    public static int getRespecRefund(FleetMemberAPI member) {
-        if (member == null) return 0;
-        return arondight.state.ArondightState.getSpentNodeSp(member.getId())
-                + arondight.state.ArondightState.getSpentFormSp(member.getId());
-    }
-
-    public static java.util.List<String> getRespecRelockForms(FleetMemberAPI member) {
-        if (member == null) return java.util.Collections.emptyList();
-        return WeaveActions.relockableForms(member.getId());
-    }
-
-    public static String getRespecLandingForm(FleetMemberAPI member) {
-        if (member == null) return null;
-        String current = arondight.state.ArondightState.getCurrentForm(member.getId());
-        if (current == null || arondight.ArondightIds.FORM_BASE.equals(current)) return null;
-        return arondight.ArondightIds.FORM_BASE;
-    }
-
     public static void healOnGameLoad() {
         WeaveActions.healOnGameLoad();
     }
 
     public static boolean weaveNode(FleetMemberAPI member, String nodeId, TextPanelAPI textPanel) {
         return WeaveActions.weaveNode(member, nodeId, textPanel);
-    }
-
-    public static boolean respec(FleetMemberAPI member, TextPanelAPI textPanel) {
-        return WeaveActions.respec(member, textPanel);
     }
 
     public static void apply(FleetMemberAPI member) {
@@ -139,9 +108,5 @@ public final class ArondightWeave {
             }
         }
         return nodes;
-    }
-
-    static List<ArondightNode> noNodes() {
-        return Collections.emptyList();
     }
 }

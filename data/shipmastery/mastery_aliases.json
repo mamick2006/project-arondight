@@ -1,0 +1,14 @@
+# Ship Mastery System reads this file. Every form of the Arondight shares the base form's mastery points and levels.
+{
+	"arondight_base":[
+		"arondight_durendal",
+		"arondight_longinus",
+		"arondight_curtana",
+		"arondight_hauteclere",
+		"arondight_joyeuse",
+		"arondight_gaebolg",
+		"arondight_rhongomyniad",
+		"arondight_clarent",
+		"arondight_fragarach"
+	]
+}

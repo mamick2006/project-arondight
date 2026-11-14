@@ -1,14 +1,17 @@
 package arondight.campaign.missions;
 
 import java.awt.Color;
+import java.util.Map;
 import java.util.Random;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
 import com.fs.starfarer.api.campaign.FleetAssignment;
+import com.fs.starfarer.api.campaign.InteractionDialogAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.StarSystemAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 import com.fs.starfarer.api.fleet.FleetMemberType;
 import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
@@ -58,6 +61,7 @@ public class ArondightReclaimerMission extends HubMissionWithSearch {
 
 		requireSystemTags(ReqMode.NOT_ANY, Tags.THEME_CORE_POPULATED);
 		requireSystemWithinRangeOf(from, 14f);
+		requireSystemNotHasPulsar();
 		preferSystemUnexplored();
 		relaySystem = pickSystem();
 		if (relaySystem == null) return false;
@@ -93,6 +97,14 @@ public class ArondightReclaimerMission extends HubMissionWithSearch {
 		return true;
 	}
 
+	@Override
+	protected void endSuccess(InteractionDialogAPI dialog, Map<String, MemoryAPI> memoryMap) {
+		super.endSuccess(dialog, memoryMap);
+		ArondightQuest.set(ArondightQuest.RELAY_SCANNED);
+		ArondightQuest.set(ArondightQuest.ESCORT_DEFEATED);
+		ArondightQuest.set(ArondightQuest.M2_DONE);
+	}
+
 	public static final String ESCORT_FLEET_FLAG = "$arondight_escortFleet";
 
 	public static class SpawnThreatEscort implements TriggerAction {
@@ -123,6 +135,7 @@ public class ArondightReclaimerMission extends HubMissionWithSearch {
 			Misc.addDefeatTrigger(fleet, ESCORT_DEFEAT_TRIGGER);
 			fleet.getMemoryWithoutUpdate().set(ESCORT_FLEET_FLAG, true);
 			hardenEscort(fleet);
+			fleet.addTag(Tags.FLEET_IGNORES_CORONA);
 
 			CampaignFleetAPI player = Global.getSector().getPlayerFleet();
 			fleet.addAssignment(FleetAssignment.INTERCEPT, player, 20f);
@@ -185,17 +198,8 @@ public class ArondightReclaimerMission extends HubMissionWithSearch {
 		ensureGenRandom();
 		ensureEntities();
 		if (ArondightQuest.gone(relay) || relay.getContainingLocation() == null) return;
-		boolean alive = false;
-		for (CampaignFleetAPI f : relay.getContainingLocation().getFleets()) {
-			if (!f.getMemoryWithoutUpdate().getBoolean(ESCORT_FLEET_FLAG)) continue;
-			alive = true;
-			f.setAIMode(true);
-			hardenEscort(f);
-			for (FleetMemberAPI m : f.getFleetData().getMembersListCopy()) {
-				m.getRepairTracker().setCR(Math.max(m.getRepairTracker().getCR(), 0.7f));
-			}
-		}
-		if (!alive && currentStage == Stage.ESCORT_FIGHT
+		if (!ArondightQuest.hasLiveFleet(relay.getContainingLocation(), ESCORT_FLEET_FLAG)
+				&& currentStage == Stage.ESCORT_FIGHT
 				&& !ArondightQuest.mem(ArondightQuest.ESCORT_DEFEATED)
 				&& !ArondightQuest.mem(ArondightQuest.M2_DONE)) {
 			new SpawnThreatEscort(relay).doAction(null);

@@ -6,6 +6,9 @@
 	# the render keys (layers/showInCampaign/showIconOnMap) are LOAD-BEARING:
 	# the engine defaults them to hidden/no-layer, so an entry without them is
 	# interactable yet INVISIBLE in space and on the map
+	#
+	# customDescriptionId names the entity's CUSTOM row in
+	# data/strings/descriptions.csv, which the hover tooltip shows
 	"arondight_habitat":{
 		"defaultName":"Broceliande Station",
 		"defaultRadius":60,
@@ -14,6 +17,7 @@
 		"aOrAn":"a",
 		"isOrAre":"is",
 		"interactionImage":"graphics/arondight/illustrations/station_broceliande.jpg",
+		"customDescriptionId":"arondight_habitat",
 		"icon":"graphics/icons/station_research_broken.png",
 		"iconWidth":20,
 		"iconHeight":20,
@@ -38,6 +42,7 @@
 		"aOrAn":"a",
 		"isOrAre":"is",
 		"interactionImage":"graphics/arondight/illustrations/dead_relay.jpg",
+		"customDescriptionId":"arondight_relay",
 		"icon":"graphics/icons/relay.png",
 		"iconWidth":24,
 		"iconHeight":24,
@@ -62,6 +67,7 @@
 		"aOrAn":"a",
 		"isOrAre":"is",
 		"interactionImage":"graphics/arondight/illustrations/deep_anchorage.jpg",
+		"customDescriptionId":"arondight_staging",
 		"icon":"graphics/icons/station0.png",
 		"iconWidth":20,
 		"iconHeight":20,

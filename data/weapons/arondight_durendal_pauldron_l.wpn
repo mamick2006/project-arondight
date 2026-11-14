@@ -5,7 +5,7 @@
 	"size":"SMALL",
 	"turretSprite":"graphics/arondight/ships/parts/arondight_durendal_pauldron_l.png",
 	"hardpointSprite":"graphics/arondight/ships/parts/arondight_durendal_pauldron_l.png",
-	"turretOffsets":[0, 0],
+	"turretOffsets":[-5.4, 3.96],
 	"turretAngleOffsets":[0],
 	"hardpointOffsets":[0, 0],
 	"hardpointAngleOffsets":[0],

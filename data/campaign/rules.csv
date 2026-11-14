@@ -5,7 +5,8 @@ ArondightCMD ensureWardens","Your comm board lights with a burst of machine traf
 arondightHabDockFirst,OpenInteractionDialog,"$arondight_habitat
 $global.arondight_wardensDefeated
 !$global.arondight_logsRead
-!$global.arondight_m1Done","ShowDefaultVisual","Broceliande Station silently accepts your docking request. Inside, your lamps find what probably at some point used to be corridors. The deck plating has been drawn out and re-laid in overlapping courses, like wickerwork, and the walls meet the floor at eighty-five degrees.
+!$global.arondight_m1Done
+!$global.arondight_loomWon","ShowDefaultVisual","Broceliande Station silently accepts your docking request. Inside, your lamps find what probably at some point used to be corridors. The deck plating has been drawn out and re-laid in overlapping courses, like wickerwork, and the walls meet the floor at eighty-five degrees.
 
 There are no bodies, no scorch marks. The crew spaces are simply absent, worked back into material, and the material worked into an idea of a load-bearing wall.
 
@@ -15,10 +16,11 @@ arondightHabLeave:Return to your ship",
 arondightHabDockReturn,OpenInteractionDialog,"$arondight_habitat
 $global.arondight_wardensDefeated
 $global.arondight_logsRead
-!$global.arondight_m1Done","ShowDefaultVisual","The station accepts your docking request the same way it did before. The route to the gantry bay stays lit for you now, as a courtesy.","arondightHabGantry:Head for the gantry bay
+!$global.arondight_m1Done
+!$global.arondight_loomWon","ShowDefaultVisual","The station accepts your docking request the same way it did before. The route to the gantry bay stays lit for you now, as a courtesy.","arondightHabGantry:Head for the gantry bay
 arondightHabLeave:Return to your ship",
 arondightHabDockDone,OpenInteractionDialog,"$arondight_habitat
-$global.arondight_m1Done","ShowDefaultVisual","Broceliande Station sits quiet on your scopes. The proving course behind the bay doors stays dark, and the docking channel carries no denial and no welcome. Whatever the station spent those years finishing, it considers the work delivered.","arondightHabLeave:Leave",
+$global.arondight_loomWon","ShowDefaultVisual","Broceliande Station sits quiet on your scopes. The proving course behind the bay doors stays dark, and nothing answers on the docking channel.","arondightHabLeave:Leave",
 arondightHabLog1,DialogOptionSelected,"$option == arondightHabLog1",,"ACCESS GRANTED // WATCH LOG, FABRICATION LEVEL // CLEARANCE: GALENA
 
 Entry, cycle 197.4.11. Test article exceeded its growth envelope during third shift. Fabrication watch requested a cold stop of the matrix. Denied at director level. Citation: acquisition timetable.
@@ -35,10 +37,16 @@ I have re-tasked the wardens to my own authority. If this reaches the Director: 
 
 If someone finds this in the future, take whatever it's made. Protect us, protect humanity from the coming Threat.","arondightHabGantry:Head for the gantry bay
 arondightHabLeave:Return to your ship",
-arondightHabGantry,DialogOptionSelected,"$option == arondightHabGantry",,"The power is still on in the gantry bay. In the cradle hangs a frame, shaped like a man and about the size of a frigate. Matte-gray, like clay ready to be formed. There is no dust on it, even though every other surface in the bay is covered.
+arondightHabGantry,DialogOptionSelected,"$option == arondightHabGantry","ArondightCMD syncSkipProving
+FireAll ArondightGantryOptions","The power is still on in the gantry bay. In the cradle hangs a frame, shaped like a man and about the size of a frigate. Matte-gray, like clay ready to be formed. There is no dust on it, even though every other surface in the bay is covered.
 
-When your lamp crosses the cockpit, the cradle looks back. Rings of running lights wake up in the dark beyond the bay doors, one after another, going green. A proving course. You feel like it's asking you to prove you can do what is necessary.","arondightHabBoard:Board the frame
-arondightHabLeave:Back away",
+When your lamp crosses the cockpit, the cradle looks back. Rings of running lights wake up in the dark beyond the bay doors, one after another, going green. A proving course. You feel like it's asking you to prove you can do what is necessary.
+
+The exit gate is at the far end of the course. Reach it before it seals.",,
+arondightHabGantryOptions,ArondightGantryOptions,,,,"1:arondightHabBoard:Board the frame
+3:arondightHabLeave:Back away",
+arondightHabGantrySkip,ArondightGantryOptions,$arondight_skipProving,,,2:arondightHabSkip:Take the frame and skip the course,
+arondightHabSkip,DialogOptionSelected,"$option == arondightHabSkip","ArondightCMD skipProving","Your crew works the cradle clamps loose by hand, and the frame comes free. Beyond the bay doors, the course lights go dark one ring at a time.",arondightHabLeave:Return to your ship,
 arondightHabBoard,DialogOptionSelected,"$option == arondightHabBoard","ArondightCMD startProving",,,
 arondightHabLeave,DialogOptionSelected,"$option == arondightHabLeave","DismissDialog",,,
 ArondightWardensDefeated,ArondightWardensDefeated,"!$global.arondight_wardensDefeated","$global.arondight_wardensDefeated = true
@@ -62,7 +70,7 @@ arondightRelayAgain,OpenInteractionDialog,"$arondight_relay
 $global.arondight_relayScanned","ShowDefaultVisual
 ArondightCMD ensureEscort","The relay's buffer is already yours.","arondightLeave:Leave",
 ArondightEscortDefeated,ArondightEscortDefeated,"!$global.arondight_escortDefeated","$global.arondight_escortDefeated = true
-Call $global.arondight_rec_ref updateStage","The last of the escort breaks up still in formation. No distress call went out. Nothing out here was listening for one anyway.",,
+Call $global.arondight_rec_ref updateStage","The last of the escort breaks up still in formation. No distress call went out.",,
 arondightStagingEarly,OpenInteractionDialog,"$arondight_staging
 !$global.arondight_escortDefeated","ShowDefaultVisual
 ArondightCMD ensureEscort","The anchorage is cold at this range, and nothing here answers your instruments. Whatever course the relay recorded, it ends here.","arondightLeave:Leave",

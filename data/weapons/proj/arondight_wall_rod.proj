@@ -1,6 +1,6 @@
 {
 	# the lattice
-	# wall as BARS - one rod's length carries the depth the classic style needed
+	# wall as BARS: one rod's length carries the depth the classic style needed
 	# a second staggered layer for, so the wall costs half the entities; being
 	# ballistic, it also sheds the missile engine tick, trail, and PD bracket
 	"id":"arondight_wall_rod",

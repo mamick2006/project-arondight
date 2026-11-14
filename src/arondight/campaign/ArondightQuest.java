@@ -2,6 +2,8 @@ package arondight.campaign;
 
 import com.fs.starfarer.api.EveryFrameScript;
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.LocationAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.TextPanelAPI;
 import com.fs.starfarer.api.combat.ShipVariantAPI;
@@ -14,6 +16,7 @@ import com.fs.starfarer.api.loading.VariantSource;
 import com.fs.starfarer.api.util.Misc;
 
 import arondight.ArondightIds;
+import arondight.ArondightStrings;
 import arondight.campaign.bar.ArondightBarEvent;
 import arondight.campaign.missions.ArondightLoomMission;
 import arondight.campaign.missions.ArondightReclaimerMission;
@@ -56,6 +59,7 @@ public class ArondightQuest {
 	public static final String DUEL_STARTED = "$arondight_duelStarted";
 	public static final String DUEL_WON = "$arondight_duelWon";
 	public static final String M2_DONE = "$arondight_m2Done";
+	public static final String START_NOTE_SHOWN = "$arondight_startNoteShown";
 
 	public static final String FRAME_MEMBER = "$arondight_frameMember";
 
@@ -112,6 +116,7 @@ public class ArondightQuest {
 		if (!present && !mem(QUEST_ACCEPTED) && !mem(SALVOR_DECLINED)) {
 			PortsideBarData.getInstance().addEvent(new ArondightBarEvent());
 		}
+		postStartNoteIfDue();
 
 		ArondightSoloBattle.restoreIfLeftOver();
 
@@ -142,6 +147,21 @@ public class ArondightQuest {
 		arondight.combat.loom.LoomScenarioPlugin.resetForLoad();
 	}
 
+	public static boolean postStartNoteIfDue() {
+		if (mem(START_NOTE_SHOWN) || mem(QUEST_ACCEPTED) || mem(SALVOR_DECLINED)) return false;
+		String note = ArondightStrings.quest("quest_start_note");
+		try {
+			Global.getSector().getCampaignUI().getMessageDisplay()
+					.addMessage(note, START_NOTE_HIGHLIGHT, Misc.getHighlightColor());
+		} catch (Exception e) {
+			return false;
+		}
+		set(START_NOTE_SHOWN);
+		return true;
+	}
+
+	private static final String START_NOTE_HIGHLIGHT = "Project Arondight";
+
 	public static void ensureReclaimerBridge() {
 		if (!mem(M1_DONE) || mem(M2_DONE)) return;
 		if (Global.getSector().getMemoryWithoutUpdate().get("$arondight_rec_ref")
@@ -162,6 +182,15 @@ public class ArondightQuest {
 
 	public static boolean gone(SectorEntityToken entity) {
 		return entity == null || !entity.isAlive();
+	}
+
+	public static boolean hasLiveFleet(LocationAPI where, String flag) {
+		if (where == null) return false;
+		for (CampaignFleetAPI f : where.getFleets()) {
+			if (f.isDespawning() || f.isEmpty()) continue;
+			if (f.getMemoryWithoutUpdate().getBoolean(flag)) return true;
+		}
+		return false;
 	}
 
 	public static void set(String flag) {
@@ -241,8 +270,26 @@ public class ArondightQuest {
 		if (!first) {
 			return;
 		}
+		if (member != null) {
+			grantFrameStoryPoints(text);
+		}
 		ArondightReclaimerWaitScript wait = new ArondightReclaimerWaitScript();
 		Global.getSector().addScript(wait);
 		ArondightSignalIntel.onLoomWin(wait);
+	}
+
+	public static final String FRAME_SP_GRANTED = "$arondight_frame_sp_granted";
+
+	public static int grantFrameStoryPoints(TextPanelAPI text) {
+		if (mem(FRAME_SP_GRANTED)) return 0;
+		int points = ArondightSettings.getInt("arondight_frame_story_points", 3);
+		set(FRAME_SP_GRANTED);
+		if (points <= 0) return 0;
+		if (text != null) {
+			Global.getSector().getPlayerStats().addStoryPoints(points, text, false);
+		} else {
+			Global.getSector().getPlayerStats().addStoryPoints(points);
+		}
+		return points;
 	}
 }

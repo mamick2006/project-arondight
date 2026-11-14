@@ -23,7 +23,7 @@ final class ArondightShipTooltips {
     boolean isWarn();
   }
 
-  private static final float NOTE_PAD_X = 6f;
+  private static final float NOTE_GAP = 6f;
   private static final float NOTE_H = 20f;
 
   private static volatile boolean broken;
@@ -58,34 +58,33 @@ final class ArondightShipTooltips {
       if (tip == null) {
         throw new IllegalStateException("factory returned null");
       }
+      try {
+        ArondightReflect.invoke(tip, "setBgAlpha", ArondightUi.Tip.BG_ALPHA);
+      } catch (Throwable keepDefault) {
+        ArondightLog.warnOnce("native_ship_tooltip_alpha", "the form hover card kept the"
+            + " engine's translucent backing (" + keepDefault + "); nothing else changes");
+      }
       if (note != null) {
         ArondightReflect.invoke(tip, "setBeforeShowing", new Runnable() {
-          private Object lastRow;
-
           @Override
           public void run() {
             try {
-              UIPanelAPI panel = (UIPanelAPI) tip;
-              if (lastRow != null) {
-                panel.removeComponent((com.fs.starfarer.api.ui.UIComponentAPI) lastRow);
-                lastRow = null;
-              }
+              UIPanelAPI contents = (UIPanelAPI) ArondightReflect.invoke(tip, "getContents");
               String state = note.text();
-              if (state == null || state.isEmpty()) {
+              if (contents == null || state == null || state.isEmpty()) {
                 return;
               }
-              float w = panel.getPosition().getWidth();
-              float h = panel.getPosition().getHeight();
-              float rowW = w - 2f * NOTE_PAD_X;
-              CustomPanelAPI row = Global.getSettings().createCustom(rowW, NOTE_H, null);
-              TooltipMakerAPI el = row.createUIElement(rowW, NOTE_H, false);
+              float w = contents.getPosition().getWidth();
+              float h = contents.getPosition().getHeight();
+              CustomPanelAPI row = Global.getSettings().createCustom(w, NOTE_H, null);
+              TooltipMakerAPI el = row.createUIElement(w, NOTE_H, false);
               el.addPara(state, note.isWarn() ? ArondightUi.warn() : ArondightUi.gray(), 0f);
               float rowH = Math.max(NOTE_H, el.getHeightSoFar());
-              row.getPosition().setSize(rowW, rowH);
+              row.getPosition().setSize(w, rowH);
               row.addUIElement(el).inTL(0f, 0f);
-              panel.getPosition().setSize(w, h + rowH + 2f);
-              panel.addComponent(row).inTL(NOTE_PAD_X, h);
-              lastRow = row;
+              contents.addComponent(row).inTL(0f, h + NOTE_GAP);
+              contents.getPosition().setSize(w, h + NOTE_GAP + rowH);
+              ArondightReflect.invoke(tip, "updateSize");
             } catch (Throwable t) {
               markBroken(t);
             }

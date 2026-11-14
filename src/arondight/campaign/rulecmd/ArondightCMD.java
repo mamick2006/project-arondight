@@ -7,6 +7,8 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
 import com.fs.starfarer.api.campaign.CargoAPI;
 import com.fs.starfarer.api.campaign.InteractionDialogAPI;
+import com.fs.starfarer.api.campaign.TextPanelAPI;
+import com.fs.starfarer.api.campaign.rules.MemKeys;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.combat.BattleCreationContext;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
@@ -26,10 +28,13 @@ import arondight.campaign.ArondightSoloBattle;
 import arondight.campaign.missions.ArondightLoomMission;
 import arondight.campaign.missions.ArondightReclaimerMission;
 import arondight.util.ArondightLog;
+import arondight.util.ArondightSettings;
 
 import static com.fs.starfarer.api.impl.campaign.ids.MemFlags.MEMORY_KEY_NO_SHIP_RECOVERY;
 
 public class ArondightCMD extends BaseCommandPlugin {
+
+	public static final String SKIP_PROVING_FLAG = "$arondight_skipProving";
 
 	@Override
 	public boolean execute(String ruleId, InteractionDialogAPI dialog, List<Misc.Token> params, Map<String, MemoryAPI> memoryMap) {
@@ -45,6 +50,10 @@ public class ArondightCMD extends BaseCommandPlugin {
 				return ensureWardens();
 			case "ensureEscort":
 				return ensureEscort();
+			case "syncSkipProving":
+				return syncSkipProving(memoryMap);
+			case "skipProving":
+				return skipProving(dialog);
 			default:
 				return false;
 		}
@@ -75,6 +84,33 @@ public class ArondightCMD extends BaseCommandPlugin {
 						"could not re-post the Reclamation Escort at the relay ("
 						+ e + "); the Reclaimer mission may need it restored by hand.");
 			}
+		}
+		return true;
+	}
+
+	protected boolean syncSkipProving(Map<String, MemoryAPI> memoryMap) {
+		MemoryAPI local = memoryMap == null ? null : memoryMap.get(MemKeys.LOCAL);
+		if (local == null) return true;
+		if (ArondightSettings.skipProving() && !ArondightQuest.mem(ArondightQuest.M1_DONE)) {
+			local.set(SKIP_PROVING_FLAG, true, 0f);
+		} else {
+			local.unset(SKIP_PROVING_FLAG);
+		}
+		return true;
+	}
+
+	protected boolean skipProving(InteractionDialogAPI dialog) {
+		if (ArondightQuest.mem(ArondightQuest.M1_DONE) || ArondightQuest.mem(ArondightQuest.LOOM_WON)) {
+			return true;
+		}
+		TextPanelAPI text = dialog == null ? null : dialog.getTextPanel();
+		FleetMemberAPI frame = ArondightQuest.createFrameMember();
+		Global.getSector().getPlayerFleet().getFleetData().addFleetMember(frame);
+		ArondightQuest.completeMission1(frame, text);
+		if (text != null) {
+			text.setFontSmallInsignia();
+			text.addPara(ArondightStrings.quest("quest_loomwin_note"), Misc.getPositiveHighlightColor());
+			text.setFontInsignia();
 		}
 		return true;
 	}

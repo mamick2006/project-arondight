@@ -15,8 +15,10 @@ import com.fs.starfarer.api.util.Misc;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector2f;
 
+import arondight.balance.LoomWallClamp;
 import arondight.campaign.ArondightQuest;
 import arondight.combat.LethalSaveScript;
+import arondight.util.ArondightSettings;
 
 public class LoomScenarioPlugin extends BaseEveryFrameCombatPlugin {
 
@@ -47,6 +49,8 @@ public class LoomScenarioPlugin extends BaseEveryFrameCombatPlugin {
 			new java.util.IdentityHashMap<ShipAPI, Boolean>();
 	protected float[][] hSpans = null;
 	protected float[][] vSpans = null;
+	protected float bodyRadiusFraction = 0.6f;
+	private final float[] clampOut = new float[4];
 	protected final java.util.List<ShipAPI> constrained = new java.util.ArrayList<ShipAPI>();
 	protected ShipAPI sweeper = null;
 	protected List<WeaponAPI> sweeperWeapons = null;
@@ -70,8 +74,7 @@ public class LoomScenarioPlugin extends BaseEveryFrameCombatPlugin {
 		}
 
 		buildWallSpans();
-
-		live = this;
+		bodyRadiusFraction = ArondightSettings.loomBodyRadiusFraction();
 	}
 
 	protected void buildWallSpans() {
@@ -112,17 +115,20 @@ public class LoomScenarioPlugin extends BaseEveryFrameCombatPlugin {
 		if (ship == null || isWall(ship) || ship.isHulk() || ship == sweeper
 				|| hSpans == null) return;
 		Vector2f loc = ship.getLocation();
-		float band = LoomMazeGen.JAMB + ship.getCollisionRadius();
+		Vector2f vel = ship.getVelocity();
+		float radius = bodyRadius(ship);
+		float band = LoomMazeGen.JAMB + radius;
 		int m = Math.round((loc.y + LoomMazeGen.HALF_H) / 1125f);
 		if (m >= 1 && m <= LoomMazeGen.TOP) {
 			float lineY = LoomMazeGen.Y[m];
 			float dy = loc.y - lineY;
 			if (dy > -band && dy < band
-					&& overlapsSpan(hSpans[m], loc.x - ship.getCollisionRadius(),
-							loc.x + ship.getCollisionRadius())) {
-				float side = dy >= 0f ? 1f : -1f;
-				loc.y = lineY + side * band;
-				if (ship.getVelocity().y * side < 0f) ship.getVelocity().y = 0f;
+					&& LoomWallClamp.resolve(hSpans[m], LoomMazeGen.JAMB, radius,
+							loc.x, dy, vel.x, vel.y, clampOut)) {
+				loc.x = clampOut[0];
+				loc.y = lineY + clampOut[1];
+				vel.x = clampOut[2];
+				vel.y = clampOut[3];
 			}
 		}
 		int k = Math.round((loc.x + LoomMazeGen.HALF_W)
@@ -131,25 +137,24 @@ public class LoomScenarioPlugin extends BaseEveryFrameCombatPlugin {
 			float lineX = LoomMazeGen.X[k];
 			float dx = loc.x - lineX;
 			if (dx > -band && dx < band
-					&& overlapsSpan(vSpans[k], loc.y - ship.getCollisionRadius(),
-							loc.y + ship.getCollisionRadius())) {
-				float side = dx >= 0f ? 1f : -1f;
-				loc.x = lineX + side * band;
-				if (ship.getVelocity().x * side < 0f) ship.getVelocity().x = 0f;
+					&& LoomWallClamp.resolve(vSpans[k], LoomMazeGen.JAMB, radius,
+							loc.y, dx, vel.y, vel.x, clampOut)) {
+				loc.y = clampOut[0];
+				loc.x = lineX + clampOut[1];
+				vel.y = clampOut[2];
+				vel.x = clampOut[3];
 			}
 		}
 	}
 
-	protected boolean isWall(ShipAPI ship) {
-		return wallSet.containsKey(ship);
+	public float bodyRadius(ShipAPI ship) {
+		com.fs.starfarer.api.combat.ShieldAPI shield = ship.getShield();
+		return LoomWallClamp.bodyRadius(shield != null, shield != null ? shield.getRadius() : 0f,
+				ship.getCollisionRadius(), bodyRadiusFraction);
 	}
 
-	protected static boolean overlapsSpan(float[] spans, float lo, float hi) {
-		if (spans == null) return false;
-		for (int i = 0; i < spans.length; i += 2) {
-			if (spans[i] < hi && spans[i + 1] > lo) return true;
-		}
-		return false;
+	protected boolean isWall(ShipAPI ship) {
+		return wallSet.containsKey(ship);
 	}
 
 	protected void refreshConstrained(ShipAPI player) {
@@ -162,16 +167,16 @@ public class LoomScenarioPlugin extends BaseEveryFrameCombatPlugin {
 		}
 	}
 
-	protected static LoomScenarioPlugin live = null;
-
 	public static LoomScenarioPlugin getLive() {
-		if (live == null) return null;
-		if (live.engine == null || live.engine != Global.getCombatEngine()) return null;
-		return live;
+		CombatEngineAPI current = Global.getCombatEngine();
+		if (current == null) return null;
+		Object plugin = current.getPluginOfClass(LoomScenarioPlugin.class);
+		if (!(plugin instanceof LoomScenarioPlugin)) return null;
+		LoomScenarioPlugin live = (LoomScenarioPlugin) plugin;
+		return live.over ? null : live;
 	}
 
 	public static void resetForLoad() {
-		live = null;
 		LoomZoomLock.restore();
 	}
 
@@ -191,10 +196,6 @@ public class LoomScenarioPlugin extends BaseEveryFrameCombatPlugin {
 		float travel = (total - Math.min(sweeperProgress, total)) / speed;
 		float delayLeft = Math.max(0f, SWEEPER_ACTIVATION_DELAY - sweeperClock);
 		return delayLeft + travel;
-	}
-
-	public boolean isOver() {
-		return over;
 	}
 
 	public boolean isWeaponsLocked() {
@@ -319,7 +320,6 @@ public class LoomScenarioPlugin extends BaseEveryFrameCombatPlugin {
 			}
 			if (lethalSave != null && lethalSave.isTriggered()) {
 				over = true;
-				live = null;
 				LoomZoomLock.restore();
 				hulkWallsForResolution();
 				return;
@@ -343,11 +343,9 @@ public class LoomScenarioPlugin extends BaseEveryFrameCombatPlugin {
 				engine.maintainStatusForPlayerShip("arondight_loom_lock",
 						"graphics/icons/relay.png", "PROVING COURSE",
 						fireLockLine(), true);
-				if (eta >= 0f && sweeperClock < SWEEPER_ACTIVATION_DELAY) {
-					engine.maintainStatusForPlayerShip("arondight_loom_run",
-							"graphics/icons/relay.png", "PROVING COURSE",
-							runLine(), true);
-				}
+				engine.maintainStatusForPlayerShip("arondight_loom_run",
+						"graphics/icons/relay.png", "PROVING COURSE",
+						runLine(), false);
 
 				constrainToMaze(player);
 
@@ -522,12 +520,10 @@ public class LoomScenarioPlugin extends BaseEveryFrameCombatPlugin {
 		hulkWallsForResolution();
 		engine.setDoNotEndCombat(false);
 		engine.endCombat(2f, FleetSide.PLAYER);
-		live = null;
 	}
 
 	protected void lose(ShipAPI player) {
 		over = true;
-		live = null;
 		LoomZoomLock.restore();
 		if (player != null) {
 			engine.addFloatingText(new Vector2f(player.getLocation().x, player.getLocation().y + 120f),

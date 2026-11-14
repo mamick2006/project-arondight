@@ -33,20 +33,16 @@ final class ArondightNodes {
         return nodeId == null ? null : BY_ID.get(nodeId);
     }
 
-    static int weaveCap() {
-        return ArondightSettings.weaveCap();
-    }
-
     private static synchronized void ensure() {
         if (ALL != null) return;
 
-        float hullMult = ArondightSettings.getFloat("arondight_node_hull_mult", 1.15f);
+        float hullMult = ArondightSettings.getFloat("arondight_node_hull_mult", 1.30f);
         float armorFlat = ArondightSettings.getFloat("arondight_node_armor_flat", 80f);
-        float fluxCapMult = ArondightSettings.getFloat("arondight_node_fluxcap_mult", 1.15f);
+        float fluxCapMult = ArondightSettings.getFloat("arondight_node_fluxcap_mult", 1.25f);
         float fluxDissMult = ArondightSettings.getFloat("arondight_node_fluxdiss_mult", 1.15f);
-        float speedFlat = ArondightSettings.getFloat("arondight_node_speed_flat", 10f);
-        float maneuverMult = ArondightSettings.getFloat("arondight_node_maneuver_mult", 1.25f);
-        int opFlat = ArondightSettings.getInt("arondight_node_op_flat", 2);
+        float speedFlat = ArondightSettings.getFloat("arondight_node_speed_flat", 20f);
+        float maneuverMult = ArondightSettings.getFloat("arondight_node_maneuver_mult", 1.5f);
+        int opFlat = ArondightSettings.getInt("arondight_node_op_flat", 3);
         int loomSecs = Math.round(1f
                 / Math.max(0.001f, ArondightSettings.getFloat("arondight_loom_ammo_per_sec", 0.04f)));
         int watchdogRespawn = Math.round(
@@ -60,7 +56,7 @@ final class ArondightNodes {
         int afterDist = Math.round(ArondightSettings.getFloat("arondight_afterimage_dist", 250f));
         int afterCd = Math.round(ArondightSettings.getFloat("arondight_afterimage_cooldown", 12f));
         int bleedRange = Math.round(ArondightSettings.getFloat("arondight_bleed_range", 500f));
-        int bleedDamage = Math.round(ArondightSettings.getFloat("arondight_bleed_damage", 60f));
+        int bleedDamage = Math.round(ArondightSettings.getFloat("arondight_bleed_damage", 110f));
         int harvestHull = Math.round(
                 ArondightSettings.getFloat("arondight_harvest_hull", 0.10f) * 100f);
         int harvestArmor = Math.round(
@@ -70,10 +66,14 @@ final class ArondightNodes {
         int salvageBonus = Math.round(
                 ArondightSettings.getFloat("arondight_salvage_bonus", 0.2f) * 100f);
         int zeroPoint = Math.round(
-                ArondightSettings.getFloat("arondight_zero_point_flux_level", 0.05f) * 100f);
+                ArondightSettings.getFloat("arondight_zero_point_flux_level", 0.15f) * 100f);
         int actuators = Math.round(ArondightSettings.getFloat("arondight_actuators_bonus", 25f));
         int bufferPct = Math.round(
-                ArondightSettings.getFloat("arondight_buffer_fraction", 0.15f) * 100f);
+                ArondightSettings.getFloat("arondight_buffer_fraction", 0.25f) * 100f);
+        int faradayPct = Math.round((1f
+                - ArondightSettings.getFloat("arondight_faraday_emp_mult", 0.5f)) * 100f);
+        int dockPct = Math.round(ArondightSettings.getFloat("arondight_dock_cr_recovery_pct", 100f));
+        int purgePct = Math.round(ArondightSettings.getFloat("arondight_purge_vent_pct", 25f));
 
         List<ArondightNode> nodes = new ArrayList<>();
 
@@ -149,6 +149,18 @@ final class ArondightNodes {
                 ArondightStrings.weave("node_zero_point_idle_name"),
                 ArondightStrings.weave("node_zero_point_idle_desc", zeroPoint),
                 Cluster.SYSTEM, Arrays.asList(ArondightIds.NODE_QUICK_CYCLE)));
+        nodes.add(new PassiveNode(ArondightIds.NODE_FARADAY_MESH,
+                ArondightStrings.weave("node_faraday_mesh_name"),
+                ArondightStrings.weave("node_faraday_mesh_desc", faradayPct),
+                Cluster.SYSTEM, Arrays.asList(ArondightIds.NODE_CHARGE_CELL)));
+        nodes.add(new PassiveNode(ArondightIds.NODE_DOCK_CYCLE,
+                ArondightStrings.weave("node_dock_cycle_name"),
+                ArondightStrings.weave("node_dock_cycle_desc", dockPct),
+                Cluster.SYSTEM, Arrays.asList(ArondightIds.NODE_ZERO_POINT_IDLE)));
+        nodes.add(new PassiveNode(ArondightIds.NODE_PURGE_VALVES,
+                ArondightStrings.weave("node_purge_valves_name"),
+                ArondightStrings.weave("node_purge_valves_desc", purgePct),
+                Cluster.SYSTEM, Arrays.asList(ArondightIds.NODE_DOCK_CYCLE)));
 
         nodes.add(new PassiveNode(ArondightIds.NODE_WATCHDOG_REMOTES,
                 ArondightStrings.weave("node_watchdog_remotes_name"),

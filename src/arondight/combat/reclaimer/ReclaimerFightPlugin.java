@@ -112,7 +112,7 @@ public class ReclaimerFightPlugin extends BaseEveryFrameCombatPlugin {
 	protected void maintainHud() {
 		if (boss == null || !boss.isAlive()) return;
 		int pct = (int) (100f * boss.getHitpoints() / boss.getMaxHitpoints());
-		int stage = brain == null ? 1 : brain.getPhase();
+		int stage = brain == null ? 1 : brain.getStage();
 		if (stage < 1) stage = 1;
 		if (stage > STAGE_NUMERALS.length - 1) stage = STAGE_NUMERALS.length - 1;
 		engine.maintainStatusForPlayerShip("arondight_duel_status",

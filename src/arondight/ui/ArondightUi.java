@@ -5,6 +5,7 @@ import java.awt.Color;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CustomUIPanelPlugin;
 import com.fs.starfarer.api.graphics.SpriteAPI;
+import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.CustomPanelAPI;
 import com.fs.starfarer.api.ui.LabelAPI;
 import com.fs.starfarer.api.ui.ButtonAPI;
@@ -110,7 +111,46 @@ public final class ArondightUi {
     return true;
   }
 
+  public static final String FONT_CAPTION = "graphics/fonts/orbitron12condensed.fnt";
+  public static final String FONT_VALUE = "graphics/fonts/insignia25LTaa.fnt";
+
+  public static final float INSET = 5f;
+
+  public static final float LINE_SLACK = 4f;
+
+  public static float textWidth(CustomPanelAPI host, String font, String text) {
+    TooltipMakerAPI scratch = host.createUIElement(400f, 20f, false);
+    if (font != null) {
+      scratch.setParaFont(font);
+    }
+    return scratch.createLabel(text, Color.white).computeTextWidth(text);
+  }
+
+  public static LabelAPI line(CustomPanelAPI host, String text, String font, Color color,
+      float x, float y, boolean rightAligned) {
+    float ink = textWidth(host, font, text);
+    float w = (float) Math.ceil(ink) + 2f * INSET + LINE_SLACK;
+    TooltipMakerAPI el = host.createUIElement(w, 20f, false);
+    if (font != null) {
+      el.setParaFont(font);
+    }
+    LabelAPI label = el.addPara(text, 0f);
+    label.setColor(color);
+    if (font != null) {
+      el.setParaFontDefault();
+    }
+    host.addUIElement(el).inTL(rightAligned ? x - ink - INSET : x - INSET, y);
+    return label;
+  }
+
   public static final Color CLEAR = new Color(0, 0, 0, 0);
+
+  private static final Color INVISIBLE = new Color(0, 0, 0, 255);
+
+  public static ButtonAPI addInvisibleButton(TooltipMakerAPI el, Object data, float w,
+      float h) {
+    return el.addButton("", data, INVISIBLE, INVISIBLE, Alignment.MID, null, w, h, 0f);
+  }
 
   public static Color alpha(Color c, int a) {
     return new Color(c.getRed(), c.getGreen(), c.getBlue(), a);
@@ -126,6 +166,8 @@ public final class ArondightUi {
   }
 
   public abstract static class Tip implements TooltipMakerAPI.TooltipCreator {
+
+    public static final float BG_ALPHA = 1f;
 
     private final float width;
 
@@ -146,12 +188,20 @@ public final class ArondightUi {
     public float getTooltipWidth(Object param) {
       return width;
     }
+
+    @Override
+    public final void createTooltip(TooltipMakerAPI t, boolean expanded, Object param) {
+      t.setBgAlpha(BG_ALPHA);
+      fill(t, expanded, param);
+    }
+
+    protected abstract void fill(TooltipMakerAPI t, boolean expanded, Object param);
   }
 
   public static Tip tip(final String text) {
     return new Tip(300f) {
       @Override
-      public void createTooltip(TooltipMakerAPI t, boolean expanded, Object param) {
+      public void fill(TooltipMakerAPI t, boolean expanded, Object param) {
         t.addPara(text, text(), 0f);
       }
     };

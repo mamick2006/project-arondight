@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import com.fs.starfarer.api.GameState;
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.CampaignUIAPI;
-import com.fs.starfarer.api.campaign.CoreUITabId;
 import com.fs.starfarer.api.characters.MutableCharacterStatsAPI;
 import com.fs.starfarer.api.combat.ShipHullSpecAPI;
 import com.fs.starfarer.api.combat.ShipVariantAPI;
@@ -22,7 +19,9 @@ import arondight.ArondightStrings;
 import arondight.form.ArondightTransformer.TransformResult;
 import arondight.state.ArondightBudget;
 import arondight.state.ArondightState;
+import arondight.weave.ArondightUndo;
 import arondight.weave.ArondightWeave;
+import arondight.weave.ConsoleContext;
 
 final class FormActions {
 
@@ -88,8 +87,16 @@ final class FormActions {
                 return ArondightStrings.forms("form_block_sealed");
             case LOCKED_DESCENT: {
                 String current = ArondightState.getCurrentForm(member.getId());
-                if (FormTree.tierOf(current) == 2) {
+                String key = DescentNote.key(FormTree.tierOf(formId), FormTree.tierOf(current));
+                if (DescentNote.ROOT.equals(key)) {
+                    return ArondightStrings.forms("form_block_root");
+                }
+                if (DescentNote.LEAF.equals(key)) {
                     return ArondightStrings.forms("form_block_leaf");
+                }
+                if (DescentNote.PARENT.equals(key)) {
+                    return ArondightStrings.forms("form_block_parent_first",
+                            ArondightTransformer.getFormDisplayName(FormTree.parentOf(formId)));
                 }
                 return ArondightStrings.forms("form_block_descent",
                         ArondightTransformer.getFormDisplayName(current));
@@ -113,25 +120,17 @@ final class FormActions {
                     : ArondightStrings.forms("form_block_requires_sp_many", cost);
         }
         if (!ArondightBudget.fits(member.getId(), cost)) {
-            return ArondightStrings.console("console_block_budget",
-                    ArondightBudget.levelNeededFor(member.getId(), cost));
+            return ArondightBudget.blockReason(member.getId(), cost);
         }
         return null;
     }
 
     private static String getContextBlockReason() {
-        if (Global.getCurrentState() == GameState.COMBAT) {
+        if (ConsoleContext.inBattle()) {
             return ArondightStrings.forms("form_block_battle");
         }
-        if (Global.getSector() != null) {
-            if (Global.getSector().getPlayerFleet() != null
-                    && Global.getSector().getPlayerFleet().getBattle() != null) {
-                return ArondightStrings.forms("form_block_battle");
-            }
-            CampaignUIAPI ui = Global.getSector().getCampaignUI();
-            if (ui != null && ui.getCurrentCoreTab() == CoreUITabId.REFIT) {
-                return ArondightStrings.forms("form_block_refit");
-            }
+        if (ConsoleContext.inRefit()) {
+            return ArondightStrings.forms("form_block_refit");
         }
         return null;
     }
@@ -169,11 +168,20 @@ final class FormActions {
             return TransformResult.refused(ArondightStrings.forms("form_block_unknown"));
         }
 
+        String fromForm = ArondightState.getCurrentForm(member.getId());
+        boolean wasUnlocked = ArondightState.isFormUnlocked(member.getId(), targetFormId);
+        long bonusAdded = 0L;
+        long deferredAdded = 0L;
         if (charge > 0) {
-            playerStats().spendStoryPoints(charge, true, null, true,
+            MutableCharacterStatsAPI stats = playerStats();
+            long bonusBefore = stats.getBonusXp();
+            long deferredBefore = stats.getDeferredBonusXp();
+            stats.spendStoryPoints(charge, true, null, true,
                     FormTree.selectBonusXp(targetFormId),
                     ArondightStrings.forms("form_ledger_transformed",
                             ArondightTransformer.getFormDisplayName(targetFormId)));
+            bonusAdded = stats.getBonusXp() - bonusBefore;
+            deferredAdded = stats.getDeferredBonusXp() - deferredBefore;
             ArondightState.addSpentFormSp(member.getId(), charge);
             ArondightState.unlockForm(member.getId(), targetFormId);
         }
@@ -205,6 +213,10 @@ final class FormActions {
         moved.addAll(stripOpOverflowToCargo(member));
 
         member.setStatUpdateNeeded(true);
+        if (charge > 0) {
+            ArondightUndo.recordFormSelect(member.getId(), targetFormId, fromForm, wasUnlocked,
+                    charge, bonusAdded, deferredAdded);
+        }
         return TransformResult.ok(moved);
     }
 

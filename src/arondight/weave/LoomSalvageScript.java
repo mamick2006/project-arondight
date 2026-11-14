@@ -49,11 +49,11 @@ public class LoomSalvageScript implements EveryFrameScript {
 
         if (wantsBonus && !applied) {
             float bonus = ArondightSettings.getFloat("arondight_salvage_bonus", 0.2f);
-            fleet.getStats().getDynamic().getMod(Stats.SALVAGE_VALUE_MULT_FLEET_NOT_RARE)
+            fleet.getStats().getDynamic().getStat(Stats.BATTLE_SALVAGE_MULT_FLEET)
                     .modifyFlat(MOD_ID, bonus);
             applied = true;
         } else if (!wantsBonus && applied) {
-            fleet.getStats().getDynamic().getMod(Stats.SALVAGE_VALUE_MULT_FLEET_NOT_RARE)
+            fleet.getStats().getDynamic().getStat(Stats.BATTLE_SALVAGE_MULT_FLEET)
                     .unmodifyFlat(MOD_ID);
             applied = false;
         }

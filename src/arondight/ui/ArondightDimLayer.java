@@ -7,7 +7,19 @@ import com.fs.starfarer.api.ui.PositionAPI;
 
 final class ArondightDimLayer extends BaseCustomUIPanelPlugin {
 
+  static final float LOCKED = 0.52f;
+  static final float SEALED = 0.78f;
+
+  private final float strength;
   private PositionAPI pos;
+
+  ArondightDimLayer() {
+    this(LOCKED);
+  }
+
+  ArondightDimLayer(float strength) {
+    this.strength = strength;
+  }
 
   @Override
   public void positionChanged(PositionAPI position) {
@@ -20,6 +32,6 @@ final class ArondightDimLayer extends BaseCustomUIPanelPlugin {
       return;
     }
     ArondightGl.fill(pos.getX(), pos.getY(), pos.getWidth(), pos.getHeight(),
-        Color.black, 0.52f * alphaMult);
+        Color.black, strength * alphaMult);
   }
 }

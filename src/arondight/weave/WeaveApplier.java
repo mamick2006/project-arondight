@@ -7,6 +7,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipHullSpecAPI;
 import com.fs.starfarer.api.combat.ShipVariantAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
+import com.fs.starfarer.api.impl.campaign.DModManager;
 import com.fs.starfarer.api.loading.VariantSource;
 
 import arondight.ArondightIds;
@@ -29,7 +30,22 @@ final class WeaveApplier {
         ensurePrivateVariant(member, variant);
         variant = member.getVariant();
 
-        String canonicalId = resolveCanonicalId(variant, ArondightState.getCurrentForm(memberId));
+        applyTo(member, variant, resolveCanonicalId(variant, ArondightState.getCurrentForm(memberId)));
+    }
+
+    static void applyForRepairedDHull(FleetMemberAPI member, ShipVariantAPI variant) {
+        if (member == null || variant == null || Global.getSector() == null) return;
+        if (!ArondightState.isFrame(member.getId())) return;
+        ShipHullSpecAPI spec = variant.getHullSpec();
+        if (spec == null || !spec.isDefaultDHull()) return;
+        if (DModManager.getNumDMods(variant) > 0) return;
+        String formId = ArondightState.getCurrentForm(member.getId());
+        if (formId == null || !formId.equals(spec.getDParentHullId())) return;
+        applyTo(member, variant, formId);
+    }
+
+    private static void applyTo(FleetMemberAPI member, ShipVariantAPI variant, String canonicalId) {
+        String memberId = member.getId();
         ShipHullSpecAPI canonical;
         try {
             canonical = Global.getSettings().getHullSpec(canonicalId);
@@ -118,7 +134,14 @@ final class WeaveApplier {
         for (String slotId : FILLABLE_SLOTS) {
             String weaponId = variant.getWeaponId(slotId);
             if (weaponId == null || weaponId.startsWith("arondight_")) continue;
-            SpecMutators.unhideIfAnimated(spec, slotId, weaponId);
+            SpecMutators.unhideIfUnsafe(spec, slotId, weaponId);
+        }
+    }
+
+    private static void returnToCargo(ShipVariantAPI variant, String slotId, String weaponId) {
+        variant.clearSlot(slotId);
+        if (Global.getSector() != null && Global.getSector().getPlayerFleet() != null) {
+            Global.getSector().getPlayerFleet().getCargo().addWeapons(weaponId, 1);
         }
     }
 
@@ -126,15 +149,14 @@ final class WeaveApplier {
         for (String slotId : FILLABLE_SLOTS) {
             String weaponId = variant.getWeaponId(slotId);
             if (weaponId == null || weaponId.startsWith("arondight_")) continue;
-            if (!SpecMutators.isAnimatedWeapon(weaponId)) continue;
-            variant.clearSlot(slotId);
-            if (Global.getSector() != null && Global.getSector().getPlayerFleet() != null) {
-                Global.getSector().getPlayerFleet().getCargo().addWeapons(weaponId, 1);
-            }
+            if (!SpecMutators.unsafeOnHiddenMount(weaponId)
+                    && !SpecMutators.unsafeOnTurretMount(weaponId)) continue;
+            returnToCargo(variant, slotId, weaponId);
             ArondightLog.warnOnce("degraded_mount_" + weaponId, "'" + weaponId
-                    + "' is an animated weapon, and while the spec-clone capability is broken"
-                    + " the frame's hidden arm/shoulder mounts cannot carry one without"
-                    + " crashing at combat load; it was returned to cargo");
+                    + "' is animated or has more hardpoint than turret fire offsets, and"
+                    + " while the spec-clone capability is broken the frame's hidden"
+                    + " arm/shoulder mounts cannot carry it without crashing the battle;"
+                    + " it was returned to cargo");
         }
     }
 

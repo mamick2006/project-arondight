@@ -49,8 +49,7 @@ final class WeaveActions {
             return requiresSp(cost);
         }
         if (!ArondightBudget.fits(memberId, cost)) {
-            return ArondightStrings.console("console_block_budget",
-                    ArondightBudget.levelNeededFor(memberId, cost));
+            return ArondightBudget.blockReason(memberId, cost);
         }
         return null;
     }
@@ -59,22 +58,48 @@ final class WeaveActions {
         if (getWeaveBlockReason(member, nodeId) != null) return false;
         ArondightNode node = ArondightNodes.byId(nodeId);
         int cost = ArondightSettings.nodeSpCost();
-        playerStats().spendStoryPoints(cost, true, textPanel, true,
+        MutableCharacterStatsAPI stats = playerStats();
+        long bonusBefore = stats.getBonusXp();
+        long deferredBefore = stats.getDeferredBonusXp();
+        stats.spendStoryPoints(cost, true, textPanel, true,
                 ArondightSettings.nodeBonusXp(),
                 ArondightStrings.weave("weave_ledger_wove", node.getName()));
         ArondightState.addSpentNodeSp(member.getId(), nodeId, cost);
         ArondightState.addWovenNode(member.getId(), nodeId);
         WeaveApplier.apply(member);
+        ArondightUndo.recordWeave(member.getId(), nodeId, cost,
+                stats.getBonusXp() - bonusBefore, stats.getDeferredBonusXp() - deferredBefore);
         return true;
     }
 
-    static String getRespecBlockReason(FleetMemberAPI member) {
+    static String getResetWeaveBlockReason(FleetMemberAPI member) {
         if (member == null || !ArondightState.isFrame(member.getId())) {
             return ArondightStrings.weave("weave_block_no_frame");
         }
-        if (ArondightState.getWovenCount(member.getId()) == 0
-                && relockableForms(member.getId()).isEmpty()) {
+        if (ArondightState.getWovenCount(member.getId()) == 0) {
             return ArondightStrings.weave("weave_block_nothing_to_unwind");
+        }
+        return getResetContextOrFeeBlockReason();
+    }
+
+    static String getResetFormBlockReason(FleetMemberAPI member) {
+        if (member == null || !ArondightState.isFrame(member.getId())) {
+            return ArondightStrings.weave("weave_block_no_frame");
+        }
+        String memberId = member.getId();
+        if (getResetLandingForm(memberId) == null && relockableForms(memberId).isEmpty()
+                && ArondightState.getSpentFormSp(memberId) == 0) {
+            return ArondightStrings.weave("respec_block_nothing_to_reset");
+        }
+        return getResetContextOrFeeBlockReason();
+    }
+
+    private static String getResetContextOrFeeBlockReason() {
+        if (ConsoleContext.inBattle()) {
+            return ArondightStrings.console("console_block_battle");
+        }
+        if (ConsoleContext.inRefit()) {
+            return ArondightStrings.forms("form_block_refit");
         }
         int cost = ArondightSettings.respecSpCost();
         if (playerStats() == null || playerStats().getStoryPoints() < cost) {
@@ -99,55 +124,85 @@ final class WeaveActions {
         return relock;
     }
 
-    static boolean respec(FleetMemberAPI member, TextPanelAPI textPanel) {
-        if (getRespecBlockReason(member) != null) return false;
-        String memberId = member.getId();
+    static String getResetLandingForm(String memberId) {
+        String current = ArondightState.getCurrentForm(memberId);
+        if (current == null || ArondightIds.FORM_BASE.equals(current)) return null;
+        return ArondightIds.FORM_BASE;
+    }
 
+    static boolean resetWeave(FleetMemberAPI member, TextPanelAPI textPanel) {
+        if (getResetWeaveBlockReason(member) != null) return false;
+        ArondightUndo.clear();
+        String memberId = member.getId();
+        returnShoulderWeapons(member);
+        chargeResetFee(textPanel, ArondightStrings.weave("weave_ledger_unwove"));
+        refund(ArondightState.getSpentNodeSp(memberId), textPanel);
+        ArondightState.clearSpentNodeSp(memberId);
+        ArondightState.incrementRespecCount(memberId);
+        unweaveAll(member);
+        return true;
+    }
+
+    static boolean resetForm(FleetMemberAPI member, TextPanelAPI textPanel) {
+        if (getResetFormBlockReason(member) != null) return false;
+        ArondightUndo.clear();
+        String memberId = member.getId();
+        landAtBase(member);
+        chargeResetFee(textPanel, ArondightStrings.weave("respec_ledger_form"));
+        refund(ArondightState.getSpentFormSp(memberId), textPanel);
+        ArondightState.clearSpentFormSp(memberId);
+        relockForms(memberId);
+        ArondightState.incrementRespecCount(memberId);
+        return true;
+    }
+
+    private static void returnShoulderWeapons(FleetMemberAPI member) {
         ShipVariantAPI variant = member.getVariant();
-        if (variant != null && Global.getSector().getPlayerFleet() != null) {
-            for (String nodeId : ArondightState.getWovenNodes(memberId)) {
-                ArondightNode node = ArondightNodes.byId(nodeId);
-                if (!(node instanceof ShoulderUnsealNode)) continue;
-                String slotId = ((ShoulderUnsealNode) node).getSlotId();
-                String weaponId = variant.getWeaponId(slotId);
-                if (weaponId != null && !ArondightIds.WEAPON_SEALED_COVER.equals(weaponId)) {
-                    Global.getSector().getPlayerFleet().getCargo().addWeapons(weaponId, 1);
-                    variant.clearSlot(slotId);
-                }
+        if (variant == null || Global.getSector().getPlayerFleet() == null) return;
+        for (String nodeId : ArondightState.getWovenNodes(member.getId())) {
+            ArondightNode node = ArondightNodes.byId(nodeId);
+            if (!(node instanceof ShoulderUnsealNode)) continue;
+            String slotId = ((ShoulderUnsealNode) node).getSlotId();
+            String weaponId = variant.getWeaponId(slotId);
+            if (weaponId != null && !ArondightIds.WEAPON_SEALED_COVER.equals(weaponId)) {
+                Global.getSector().getPlayerFleet().getCargo().addWeapons(weaponId, 1);
+                variant.clearSlot(slotId);
             }
         }
+    }
 
-        String current = ArondightState.getCurrentForm(memberId);
-        if (current != null && !ArondightIds.FORM_BASE.equals(current)) {
+    private static void landAtBase(FleetMemberAPI member) {
+        if (getResetLandingForm(member.getId()) != null) {
             arondight.form.ArondightTransformer.transformUnchecked(member, ArondightIds.FORM_BASE);
         }
+    }
 
+    private static void chargeResetFee(TextPanelAPI textPanel, String logText) {
         playerStats().spendStoryPoints(ArondightSettings.respecSpCost(), true, textPanel, true,
-                ArondightSettings.respecBonusXp(),
-                ArondightStrings.weave("weave_ledger_unwove"));
+                ArondightSettings.respecBonusXp(), logText);
+    }
 
-        int refund = ArondightState.getSpentNodeSp(memberId)
-                + ArondightState.getSpentFormSp(memberId);
-        if (refund > 0) {
-            if (textPanel != null) {
-                playerStats().addStoryPoints(refund, textPanel, true);
-            } else {
-                playerStats().addStoryPoints(refund);
-            }
+    private static void refund(int points, TextPanelAPI textPanel) {
+        if (points <= 0) return;
+        if (textPanel != null) {
+            playerStats().addStoryPoints(points, textPanel, true);
+        } else {
+            playerStats().addStoryPoints(points);
         }
-        ArondightState.clearSpentNodeSp(memberId);
-        ArondightState.clearSpentFormSp(memberId);
+    }
 
+    private static void relockForms(String memberId) {
         for (String formId : relockableForms(memberId)) {
             ArondightState.lockForm(memberId, formId);
         }
+    }
 
+    private static void unweaveAll(FleetMemberAPI member) {
+        String memberId = member.getId();
         ArondightState.clearWovenNodes(memberId);
         ArondightState.clearShoulderFits(memberId);
-        ArondightState.incrementRespecCount(memberId);
         WeaveApplier.apply(member);
         arondight.form.ArondightTransformer.stripOpOverflowToCargo(member);
-        return true;
     }
 
     private static boolean prereqSatisfied(String memberId, ArondightNode node) {

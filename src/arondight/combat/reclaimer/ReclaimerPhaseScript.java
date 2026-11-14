@@ -240,10 +240,6 @@ public class ReclaimerPhaseScript implements AdvanceableListener, HullDamageAbou
 		return stage;
 	}
 
-	public int getPhase() {
-		return stage;
-	}
-
 	public int getInterceptCharges() {
 		return interceptCharges;
 	}
@@ -416,14 +412,8 @@ public class ReclaimerPhaseScript implements AdvanceableListener, HullDamageAbou
 	protected static final float APERTURE_WALK_DEG = 45f;
 	protected static final float APERTURE_CADENCE_MULT = 1.2f;
 
-	public static volatile String styleOverride = null;
-
 	protected String style() {
-		String s = styleOverride;
-		if (s == null) {
-			s = ArondightSettings.getString("arondight_boss_projectile_style", "rods");
-		}
-		return s;
+		return ArondightSettings.getString("arondight_boss_projectile_style", "rods");
 	}
 
 	protected String wallSpecNow = "hammer";

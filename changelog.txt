@@ -1,3 +1,41 @@
+v2.0.0
+Not save compatible with previous versions of the mod. Can be added to existing saves.
+
+- Updated for Starsector 0.98.5a.
+- Completely redesigned UI.
+- The Manage button no longer overrides your own keybinding for Y.
+- Added a setting for the Manage shortcut key.
+- Fixed Broceliande Station, the Dead Relay and the Deep Anchorage showing their earlier dialog again after you finished their mission.
+- Fixed Broceliande Station, the Dead Relay and the Deep Anchorage showing no description on hover.
+- Added a one-time note on where the quest starts, and the salvor in the bar now mentions the mech.
+- Fixed the proving course being offered again before unpausing, which gave extra Arondights.
+- Fixed the proving course walls stopping the mech early and catching it on door corners.
+- The proving course now says to reach the exit gate.
+- Added a setting to skip the proving course.
+- Split respec into Reset Form and Reset Weave.
+- Added an Undo button for weaves and form changes.
+- Afterimage now blinks along the mech's movement.
+- Static Bleed does more damage.
+- Spotter Lattice's target now takes 30% more damage instead of 50%.
+- Durendal, Hauteclere and Joyeuse have more hull and dissipate flux faster. Durendal and Joyeuse also have more armor.
+- Every form of the ship costs 5 less supplies per month, recovery cost and deployment points.
+- Each weave now adds 1 to supplies per month, recovery cost and deployment points instead of 2.
+- Added three nodes to the System branch of the weave: Surge Grid, Downtime Routine and Purge Valves.
+- You can now invest up to 5 plus your level in story points, up from your level.
+- Recovering the mech now gives 3 story points.
+- Updated the weave icons.
+- In Survival Mode, the quarantine watch at Broceliande Station is a much smaller fleet.
+- Reinforced Weave, Reactor Bloom, Drive Resonance, Neural Mesh, Expanded Lattice, Zero-Point Idle and Kinetic Buffer are stronger.
+- Gae Bolg's weapons now lock for 3 seconds instead of 5.
+- Destroying a fighter no longer counts for Harvest Reflex or for removing Gae Bolg's lock.
+- Fixed Joyeuse's ward not returning damage to the attacker.
+- Fixed Loom Salvage giving no extra salvage after battle.
+- Hopefully fixed HUD mods listing the mech's decorative parts as weapons.
+- Fixed a crash when some modded weapons fired from the arm or shoulder mounts.
+- Added an ArondightRecallFrame console command that brings back a lost mech.
+- Fixed the Dead Relay's escort losing all its combat readiness when the relay is close to a star.
+- Redid all animations and sprites to be dynamic and detailed, and more like mechs, with many different moving components
+
 v1.1.0
 Save compatible. Can be added to existing saves.
 

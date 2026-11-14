@@ -5,6 +5,10 @@
     # Rules-command resolution (REQUIRED for rules.csv actions)
     "ruleCommandPackages":["arondight.campaign.rulecmd"],
 
+    # The Manage button's shortcut key as an LWJGL key code (21 is Y, 0 is none), for a
+    # game without LunaLib. The LunaLib row of the same name overrides it.
+    "arondight_mgmt_key": 21,
+
 	"graphics": {
 		# UI icon registry: the 23 weave node icons + 4 cluster motifs the
 		# weave pane reads (category "arondight_nodes", keyed by node id / cluster key)
@@ -18,7 +22,9 @@
 			"arondight_station_broceliande": "graphics/arondight/illustrations/station_broceliande.jpg",
 			"arondight_dead_relay": "graphics/arondight/illustrations/dead_relay.jpg",
 			"arondight_deep_anchorage": "graphics/arondight/illustrations/deep_anchorage.jpg",
-			"arondight_beacon_signal": "graphics/arondight/illustrations/beacon_signal.jpg"
+			"arondight_beacon_signal": "graphics/arondight/illustrations/beacon_signal.jpg",
+			# the console's hero picture, 1200x750; the trial-won dialog draws it at 480x300
+			"arondight_frame_hangar": "graphics/arondight/illustrations/frame_hangar.jpg"
 		},
 		"arondight_nodes": {
 			"root": "graphics/arondight/icons/node_root.png",
@@ -37,6 +43,9 @@
 			"charge_cell": "graphics/arondight/icons/node_charge_cell.png",
 			"quick_cycle": "graphics/arondight/icons/node_quick_cycle.png",
 			"zero_point_idle": "graphics/arondight/icons/node_zero_point_idle.png",
+			"faraday_mesh": "graphics/arondight/icons/node_faraday_mesh.png",
+			"dock_cycle": "graphics/arondight/icons/node_dock_cycle.png",
+			"purge_valves": "graphics/arondight/icons/node_purge_valves.png",
 			"watchdog_remotes": "graphics/arondight/icons/node_watchdog_remotes.png",
 			"self_weave": "graphics/arondight/icons/node_self_weave.png",
 			"afterimage": "graphics/arondight/icons/node_afterimage.png",
@@ -51,6 +60,11 @@
 			"cluster_lattice": "graphics/arondight/icons/cluster_lattice.png"
 		}
 	},
+
+    # Defaults for the LunaLib checkboxes of the same keys, read when LunaLib
+    # is not installed.
+    "arondight_mgmt_intel_only": false,
+    "arondight_skip_proving": false,
 
     # SP economy: node/tier-2 spends give no bonus XP; respec's own point
     # stays spent at 100% bonus XP and the node SP comes back as REAL
@@ -68,34 +82,83 @@
     "arondight_tier2_bonus_xp": 0.0,
 
     # The weave. No node-count cap: total SP invested (forms + weaves) is
-    # capped at the player's LEVEL, read live from the campaign stat
+    # capped at 5 plus the player's level, read live from the campaign stat
     # (deliberately no settings knob for the budget).
     # Each woven node adds +step supplies/mo and +step supplies-to-recover
-    # (recovery cost and deployment points are one CSV column); WeaveApplier
-    # recomputes the total from state on every apply, so it never compounds.
-    "arondight_weave_logistics_step": 2,
+    # (recovery cost and deployment points are one CSV column); the total is
+    # recomputed from the woven nodes on every apply, so it never compounds.
+    "arondight_weave_logistics_step": 1,
 
     # Weave SPEC node amounts (descriptions render from these)
-    "arondight_node_hull_mult": 1.15,
+    "arondight_node_hull_mult": 1.30,
     "arondight_node_armor_flat": 80,
-    "arondight_node_fluxcap_mult": 1.15,
+    "arondight_node_fluxcap_mult": 1.25,
     "arondight_node_fluxdiss_mult": 1.15,
-    "arondight_node_speed_flat": 10,
-    "arondight_node_maneuver_mult": 1.25,
-    "arondight_node_op_flat": 2,
+    "arondight_node_speed_flat": 20,
+    "arondight_node_maneuver_mult": 1.5,
+    "arondight_node_op_flat": 3,
 
-    # Mech part animation (all ten forms). The pauldrons and the visible left
+    # Mech part animation (all ten forms). The wing blades and the visible left
     # arm sway by a fraction of how far the arm on their side is aiming off the
     # hull's heading; an arm kicks back from its mount when it fires. recoil_px
     # is the kick in sprite pixels at the reference shot damage (100). A heavier
-    # arm scales up from there, and a beam leans instead of kicking.
+    # arm scales up from there. A beam kicks once as it lights, at 0.7 of the
+    # kick, and then only the blade above it stays pushed back while it fires.
     # recoil_decay is how long a part takes to settle back, in seconds. The
     # animated deco slots need a non-zero arc in the .ship files for any of
     # this to move: the engine clamps a weapon's angle to its slot arc.
     "arondight_part_track_factor": 0.5,
     "arondight_part_arm_track_factor": 0.75,
-    "arondight_part_recoil_px": 2.0,
-    "arondight_part_recoil_decay": 0.18,
+    "arondight_part_recoil_px": 6.0,
+    "arondight_part_recoil_decay": 0.22,
+    # A shot also jolts the gun arm sideways by this many pixels, turns the
+    # left arm by counter_deg, and shrugs the blade above the arm by about
+    # shrug_deg. All three scale with the shot like recoil_px does.
+    "arondight_motion_recoil_jolt_px": 1.5,
+    "arondight_motion_arm_counter_deg": 5.0,
+    "arondight_motion_shrug_deg": 6.0,
+
+    # Flight motion (all ten forms). Angles are degrees a wing blade turns
+    # about its root. The blades fold back by speed_deg at top speed and by
+    # thrust_deg more under forward thrust, open by brake_deg when braking or
+    # reversing, and bank by bank_deg at full turn rate (the inside blade
+    # tucks, the outside one spreads). At rest they breathe by idle_deg every
+    # idle_period seconds. response is how fast a blade follows, in radians a
+    # second; damping is how soon it settles, where 1 is no overshoot.
+    "arondight_motion_blade_speed_deg": 9.0,
+    "arondight_motion_blade_thrust_deg": 6.0,
+    "arondight_motion_blade_brake_deg": 9.0,
+    "arondight_motion_blade_bank_deg": 7.0,
+    "arondight_motion_blade_idle_deg": 3.0,
+    "arondight_motion_blade_idle_period": 3.5,
+    "arondight_motion_blade_response": 14.0,
+    "arondight_motion_blade_damping": 0.55,
+    # Where a blade's root is: this fraction of the way from the sprite's
+    # centre to its inner end.
+    "arondight_motion_blade_root_frac": 0.75,
+
+    # The head turns to the ship's target, or to the cursor on the ship the
+    # player flies, at turn_rate degrees a second and no further than
+    # limit_deg off the nose. With nothing to look at it sweeps sweep_deg to
+    # each side every sweep_period seconds.
+    "arondight_motion_head_turn_rate": 160.0,
+    "arondight_motion_head_limit_deg": 60.0,
+    "arondight_motion_head_sweep_deg": 25.0,
+    "arondight_motion_head_sweep_period": 6.0,
+
+    # The main thrusters grow by this fraction of their length under forward
+    # thrust (a third of it in width, two thirds in glow).
+    "arondight_motion_thruster_swell": 0.75,
+
+    # Vernier flares, one on each blade's rear edge. They fire with turning
+    # and strafing, and at the cruise level under forward thrust. The nozzle
+    # is not set here: it is turretOffsets in each blade's .wpn.
+    # cant_deg turns the flare away from the hull. length and width are the
+    # flare's size in pixels at full burn.
+    "arondight_motion_vernier_cant_deg": 25.0,
+    "arondight_motion_vernier_length": 18.0,
+    "arondight_motion_vernier_width": 8.0,
+    "arondight_motion_vernier_cruise": 0.45,
 
     # Stasis (Curtana line): sustained effects, no timed freezes. Curtana
     # slows to slow_mult while its beam holds a HULL (shield hits do nothing);
@@ -120,7 +183,7 @@
     # Spotter (Longinus line): the entropy-amplifier shape, where the marked
     # target takes damage_mult on all four taken-damage channels for the
     # timed active; range gates the trigger (READY / OUT OF RANGE / NO TARGET)
-    "arondight_spotter_damage_mult": 1.5,
+    "arondight_spotter_damage_mult": 1.3,
     "arondight_spotter_range": 4000,
     "arondight_longinus_range_mult": 3,
 
@@ -128,9 +191,9 @@
     "arondight_double_range_mult": 2.0,
 
     # Gae Bolg strike economy: 3x damage, double ammo per shot, the FIRED
-    # weapon locks 5 s (a kill clears all locks); unpaid ammo costs half the
+    # weapon locks 3 s (a kill clears all locks); unpaid ammo costs half the
     # weapon's damage as shield-bypassing self-damage
-    "arondight_gaebolg_lock": 5,
+    "arondight_gaebolg_lock": 3,
     "arondight_gaebolg_damage_mult": 3,
     "arondight_gaebolg_ammo_mult": 2,
     "arondight_gaebolg_self_damage_mult": 0.5,
@@ -152,14 +215,22 @@
     "arondight_pulse_haste_mult": 1.35,
 
     # LATTICE nodes
-    "arondight_zero_point_flux_level": 0.05,
+    "arondight_zero_point_flux_level": 0.15,
+    # Surge Grid: EMP damage taken is multiplied by this (0.5 = half)
+    "arondight_faraday_emp_mult": 0.5,
+    # Downtime Routine: per cent added to the daily combat readiness recovery rate
+    "arondight_dock_cr_recovery_pct": 100,
+    # Purge Valves: per cent added to the venting rate
+    "arondight_purge_vent_pct": 25,
+    # Story points granted once, the moment the quest makes the frame yours
+    "arondight_frame_story_points": 3,
     "arondight_watchdog_variant": "drone_terminator",
     "arondight_watchdog_leash": 220,
     "arondight_watchdog_respawn": 10,
     "arondight_selfweave_cap": 1.0,
     "arondight_selfweave_rate": 0.005,
     "arondight_bleed_range": 500,
-    "arondight_bleed_damage": 60,
+    "arondight_bleed_damage": 110,
     "arondight_loom_ammo_per_sec": 0.04,
     "arondight_actuators_bonus": 25,
     "arondight_harvest_hull": 0.10,
@@ -168,11 +239,15 @@
     "arondight_afterimage_threshold": 0.05,
     "arondight_afterimage_cooldown": 12,
     "arondight_afterimage_dist": 250,
-    "arondight_buffer_fraction": 0.15,
+    "arondight_buffer_fraction": 0.25,
     "arondight_salvage_bonus": 0.2,
 
-    # Missions (in-code fallbacks match these values)
+    # Missions
     "arondight_m2_offer_delay_days": 10,
+    # The quarantine watch at Broceliande Station is vanilla's medium derelict
+    # patrol. In a Survival Mode campaign its fleet point budget is this
+    # fraction of the normal one (held to 0.1 to 1). Read when the watch spawns.
+    "arondight_survival_watch_fp_mult": 0.3,
     # Reclamation Escort fire support: standoff_unit_Type300 hulls (18 FP
     # each) added on top of the fixed 2 skirmish + 2 assault roster
     "arondight_escort_standoff_units": 1,
@@ -180,6 +255,9 @@
     # checkpoints). The alpha bounds are the winnability/tension band the
     # generator rerolls against; seed 0 = random per battle.
     "arondight_loom_sweeper_speed": 135,
+    # The wall clamp holds a ship to its shield radius, or to this fraction
+    # of its collision radius when it has no shield.
+    "arondight_loom_body_radius_fraction": 0.6,
     "arondight_loom_seed": 0,
     "arondight_loom_alpha_min": 1.05,
     "arondight_loom_alpha_max": 2.4,
@@ -231,9 +309,8 @@
     "arondight_boss_swarm_interval": 5,
     "arondight_boss_aimed_interval": 0.9,
     # rods is the shipped default: lattice bars, one wall layer instead of
-    # two, the most wall-like read, and the cheapest (rods hold ~238
-    # entities flat where classic peaks ~496 concurrent and dips minimum
-    # fps; heavy ~300, also capped). classic|heavy remain selectable.
+    # two, the most wall-like read, and the cheapest (about half the
+    # bullets classic puts up). classic|heavy remain selectable.
     "arondight_boss_projectile_style": "rods",
     "arondight_boss_telegraph_seconds": 1.2,
     "arondight_boss_ring_radius": 5200,

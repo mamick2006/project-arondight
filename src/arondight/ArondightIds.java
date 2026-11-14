@@ -35,10 +35,6 @@ public final class ArondightIds {
 
     public static final String WEAPON_SEALED_COVER = "arondight_sealed_cover";
 
-    public static String armWeaponFor(String formHullId) {
-        return formHullId + "_arm";
-    }
-
     public static final String SLOT_ARM_R = "WS_ARM_R";
     public static final String SLOT_ARM_L = "WS_ARM_L";
     public static final String SLOT_SHOULDER_L = "WS_SH_L";
@@ -76,6 +72,9 @@ public final class ArondightIds {
     public static final String NODE_CHARGE_CELL = "charge_cell";
     public static final String NODE_QUICK_CYCLE = "quick_cycle";
     public static final String NODE_ZERO_POINT_IDLE = "zero_point_idle";
+    public static final String NODE_FARADAY_MESH = "faraday_mesh";
+    public static final String NODE_DOCK_CYCLE = "dock_cycle";
+    public static final String NODE_PURGE_VALVES = "purge_valves";
     public static final String NODE_WATCHDOG_REMOTES = "watchdog_remotes";
     public static final String NODE_SELF_WEAVE = "self_weave";
     public static final String NODE_AFTERIMAGE = "afterimage";
@@ -103,7 +102,6 @@ public final class ArondightIds {
     public static final String SET_TIER1_BONUS_XP = "arondight_tier1_bonus_xp";
     public static final String SET_TIER2_SP_COST = "arondight_tier2_sp_cost";
     public static final String SET_TIER2_BONUS_XP = "arondight_tier2_bonus_xp";
-    public static final String SET_WEAVE_CAP = "arondight_weave_cap";
     public static final String SET_WEAVE_LOGISTICS_STEP = "arondight_weave_logistics_step";
     public static final String SET_MGMT_INTEL_ONLY = "arondight_mgmt_intel_only";
 }

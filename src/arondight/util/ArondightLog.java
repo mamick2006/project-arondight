@@ -16,8 +16,4 @@ public final class ArondightLog {
             Global.getLogger(ArondightLog.class).warn("Project Arondight: " + message);
         }
     }
-
-    public static boolean hasWarned(String key) {
-        return warned.contains(key);
-    }
 }

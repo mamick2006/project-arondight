@@ -44,9 +44,4 @@ public abstract class FormBaseHullMod extends BaseHullMod {
         if (!id.startsWith("arondight_form_")) return null;
         return "arondight_" + id.substring("arondight_form_".length());
     }
-
-    protected static boolean hasNode(ShipAPI ship, String nodeId) {
-        return ship != null && arondight.weave.ArondightWeave
-                .readWovenTags(ship.getHullSpec()).contains(nodeId);
-    }
 }

@@ -24,16 +24,8 @@ public final class ArondightTransformer {
         return FormTree.tierOf(formId);
     }
 
-    public static int getSelectSpCost(String formId) {
-        return FormTree.selectSpCost(formId);
-    }
-
     public static String getFormDisplayName(String formId) {
         return FormTree.displayName(formId);
-    }
-
-    public static float getSelectBonusXp(String formId) {
-        return FormTree.selectBonusXp(formId);
     }
 
     public static String getTransformBlockReason(FleetMemberAPI member, String targetFormId) {

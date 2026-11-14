@@ -33,6 +33,7 @@ public class GaeBolgPlugin implements AdvanceableListener, DamageDealtModifier,
     private final Map<WeaponAPI, Float> lockRemaining = new HashMap<>();
 
     private boolean initialized = false;
+    private ArondightKillTracker kills;
 
     public GaeBolgPlugin(ShipAPI ship) {
         this.ship = ship;
@@ -46,7 +47,8 @@ public class GaeBolgPlugin implements AdvanceableListener, DamageDealtModifier,
 
         if (!initialized) {
             initialized = true;
-            ArondightKillTracker.get(engine).subscribe(ship, this);
+            kills = ArondightKillTracker.get(engine);
+            kills.subscribe(ship, this);
             for (WeaponAPI weapon : ship.getAllWeapons()) {
                 if (weapon.isDecorative()) continue;
                 lastCooldown.put(weapon, weapon.getCooldownRemaining());
@@ -95,7 +97,7 @@ public class GaeBolgPlugin implements AdvanceableListener, DamageDealtModifier,
     }
 
     private void lockWeapon(WeaponAPI weapon) {
-        float lock = ArondightSettings.getFloat("arondight_gaebolg_lock", 5f);
+        float lock = ArondightSettings.getFloat("arondight_gaebolg_lock", 3f);
         lockRemaining.put(weapon, lock);
         weapon.setRemainingCooldownTo(Math.max(weapon.getCooldownRemaining(), lock));
         lastCooldown.put(weapon, weapon.getCooldownRemaining());
@@ -148,8 +150,8 @@ public class GaeBolgPlugin implements AdvanceableListener, DamageDealtModifier,
     public String modifyDamageDealt(Object param, CombatEntityAPI target, DamageAPI damage,
                                     Vector2f point, boolean shieldHit) {
         if (target == ship) return null;
-        if (target instanceof ShipAPI && Global.getCombatEngine() != null) {
-            ArondightKillTracker.get(Global.getCombatEngine()).noteDamage(ship, (ShipAPI) target);
+        if (target instanceof ShipAPI && kills != null) {
+            kills.noteDamage(ship, (ShipAPI) target);
         }
         WeaponAPI fired = null;
         if (param instanceof BeamAPI) {

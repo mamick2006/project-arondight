@@ -12,6 +12,7 @@ public class MercyEdgeBeamEffect implements BeamEffectPlugin {
     private static final float SUSTAIN_HOLD = 0.1f;
 
     private String lastNote = null;
+    private StasisField stasis;
 
     @Override
     public void advance(float amount, CombatEngineAPI engine, BeamAPI beam) {
@@ -45,7 +46,8 @@ public class MercyEdgeBeamEffect implements BeamEffectPlugin {
 
         boolean clarent = beam.getWeapon() != null
                 && beam.getWeapon().getSpec().getWeaponId().contains("clarent");
-        StasisField field = StasisField.get(engine);
+        if (stasis == null) stasis = StasisField.get(engine);
+        StasisField field = stasis;
         if (clarent) {
             field.applySustained(source, target,
                     ArondightSettings.getFloat("arondight_stasis_timemult", 0.01f),

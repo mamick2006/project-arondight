@@ -7,28 +7,21 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.comm.IntelManagerAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 import com.fs.starfarer.api.impl.campaign.intel.BaseIntelPlugin;
-import com.fs.starfarer.api.ui.Alignment;
-import com.fs.starfarer.api.ui.ButtonAPI;
 import com.fs.starfarer.api.ui.CustomPanelAPI;
-import com.fs.starfarer.api.ui.CutStyle;
 import com.fs.starfarer.api.ui.IntelUIAPI;
-import com.fs.starfarer.api.ui.LabelAPI;
 import com.fs.starfarer.api.ui.SectorMapAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 
 import arondight.ArondightStrings;
 import arondight.form.ArondightTransformer;
 import arondight.state.ArondightState;
+import arondight.weave.ArondightResets;
+import arondight.weave.ArondightUndo;
 import arondight.weave.ArondightWeave;
 
 public class ArondightIntel extends BaseIntelPlugin {
 
   public static final String TAG = "Arondight";
-
-  private static final float FORM_SHARE = 0.45f;
-  private static final float GUTTER = 10f;
-  private static final float BAND_H = 54f;
-  private static final float RESPEC_W = 90f;
 
   public static ArondightIntel get() {
     if (Global.getSector() == null) {
@@ -82,59 +75,16 @@ public class ArondightIntel extends BaseIntelPlugin {
       FleetMemberAPI member = ArondightState.findPlayerFrame();
       String memberId = resolveMemberId(member);
 
-      addStatusBand(panel, width, member, memberId);
-
-      float paneH = height - BAND_H;
-      float leftW = Math.round(width * FORM_SHARE) - GUTTER / 2f;
-      float rightW = width - leftW - GUTTER;
-      CustomPanelAPI panes = panel.createCustomPanel(width, paneH, ArondightUi.consoleRow());
-      panel.addComponent(panes).inTL(0f, BAND_H);
-      ArondightFormPane.add(panes, 0f, leftW, paneH, member, memberId);
-      ArondightWeavePane.add(panes, leftW + GUTTER, rightW, paneH, member, memberId);
+      ArondightFrame frame = new ArondightFrame(width, height);
+      ArondightFormPane.add(panel, frame, member, memberId);
+      ArondightWeavePane.add(panel, frame, member, memberId);
+      ArondightBandControls.add(panel, frame.controlsX, 0f, member);
     } catch (Throwable t) {
       buildFailWarn(t);
       TooltipMakerAPI e = panel.createUIElement(width, height, false);
       e.addPara("The Arondight console failed to build.", ArondightUi.gray(), 0f);
       panel.addUIElement(e).inTL(0f, 0f);
     }
-  }
-
-  private void addStatusBand(CustomPanelAPI panel, float width, FleetMemberAPI member,
-      String memberId) {
-    float reserved = RESPEC_W + 18f;
-    TooltipMakerAPI band = panel.createUIElement(width - 20f - reserved, BAND_H, false);
-    String form = memberId == null ? ArondightStrings.console("console_form_none")
-        : ArondightFormPane.formName(ArondightState.getCurrentForm(memberId));
-    String where = member != null ? ArondightStrings.console("console_where_with")
-        : ArondightStrings.console("console_where_without");
-    LabelAPI l1 = band.addPara(ArondightStrings.console("console_frame_band", form, where),
-        ArondightUi.text(), 2f);
-    l1.setHighlight(form);
-    l1.setHighlightColor(ArondightUi.accent());
-    int sp = Global.getSector().getPlayerStats().getStoryPoints();
-    LabelAPI l2 = band.addPara(ArondightStrings.console("console_sp_available", sp),
-        ArondightUi.text(), 2f);
-    l2.setHighlight("" + sp);
-    l2.setHighlightColor(ArondightUi.story());
-    if (!ArondightState.areTreesUnlocked()) {
-      band.addPara(ArondightStrings.console("console_sealed_band"),
-          ArondightUi.warn(), 2f);
-    }
-    panel.addUIElement(band).inTL(10f, 2f);
-    addRespecControl(panel, width, member);
-  }
-
-  private void addRespecControl(CustomPanelAPI panel, float width, FleetMemberAPI member) {
-    CustomPanelAPI holder = panel.createCustomPanel(RESPEC_W, BAND_H - 6f,
-        ArondightUi.consoleRow());
-    TooltipMakerAPI el = holder.createUIElement(RESPEC_W, BAND_H - 6f, false);
-    ButtonAPI b = el.addButton("Respec", ArondightWeavePane.BTN_RESPEC, ArondightUi.base(),
-        ArondightUi.dark(), Alignment.MID, CutStyle.ALL, RESPEC_W, 20f, 5f);
-    ArondightUi.setEnabledSayingWhy(b, ArondightWeave.getRespecBlockReason(member) == null);
-    el.addTooltipToPrevious(ArondightWeavePane.respecTip(),
-        TooltipMakerAPI.TooltipLocation.BELOW, false);
-    holder.addUIElement(el).inTL(0f, 0f);
-    panel.addComponent(holder).inTL(width - 10f - RESPEC_W, 4f);
   }
 
   private static volatile boolean buildFailWarned;
@@ -179,9 +129,21 @@ public class ArondightIntel extends BaseIntelPlugin {
       }
       return true;
     }
-    if (ArondightWeavePane.BTN_RESPEC.equals(id)) {
+    if (ArondightBandControls.BTN_UNDO.equals(id)) {
       if (member != null) {
-        ArondightWeave.respec(member, null);
+        ArondightUndo.undo(member);
+      }
+      return true;
+    }
+    if (ArondightBandControls.BTN_RESET_WEAVE.equals(id)) {
+      if (member != null) {
+        ArondightResets.resetWeave(member, null);
+      }
+      return true;
+    }
+    if (ArondightBandControls.BTN_RESET_FORM.equals(id)) {
+      if (member != null) {
+        ArondightResets.resetForm(member, null);
       }
       return true;
     }

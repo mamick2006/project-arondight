@@ -128,6 +128,17 @@ public final class ArondightState {
         if (!(m.get(K_RESPECS) instanceof Integer)) m.put(K_RESPECS, 0);
     }
 
+    public static boolean moveFrameState(String fromId, String toId) {
+        if (fromId == null || toId == null || fromId.equals(toId)) return false;
+        Map<String, Map<String, Object>> members = members(false);
+        if (members == null || members.containsKey(toId)) return false;
+        Map<String, Object> m = members.remove(fromId);
+        if (m == null) return false;
+        m.remove(K_SHOULDER_FITS);
+        members.put(toId, m);
+        return true;
+    }
+
     public static void removeFrameState(String memberId) {
         Map<String, Map<String, Object>> members = members(false);
         if (members != null) members.remove(memberId);
@@ -221,8 +232,6 @@ public final class ArondightState {
         if (m != null) m.put(K_RESPECS, getRespecCount(memberId) + 1);
     }
 
-    private static final String LEGACY_SPENT = "__legacy";
-
     @SuppressWarnings("unchecked")
     private static Map<String, Integer> spentNodeLedger(String memberId, boolean createIfMissing) {
         Map<String, Object> m = member(memberId, createIfMissing);
@@ -231,7 +240,6 @@ public final class ArondightState {
         if (v instanceof Map) return (Map<String, Integer>) v;
         if (!createIfMissing) return null;
         Map<String, Integer> ledger = new HashMap<>();
-        if (v instanceof Integer && (Integer) v > 0) ledger.put(LEGACY_SPENT, (Integer) v);
         m.put(K_SPENT_SP, ledger);
         return ledger;
     }
@@ -241,7 +249,6 @@ public final class ArondightState {
         Map<String, Object> m = member(memberId, false);
         if (m == null) return 0;
         Object v = m.get(K_SPENT_SP);
-        if (v instanceof Integer) return (Integer) v;
         if (!(v instanceof Map)) return 0;
         int total = 0;
         for (Object amount : ((Map<String, Object>) v).values()) {
@@ -279,6 +286,17 @@ public final class ArondightState {
     public static void addSpentFormSp(String memberId, int amount) {
         Map<String, Object> m = member(memberId, true);
         if (m != null) m.put(K_SPENT_FORM_SP, getSpentFormSp(memberId) + amount);
+    }
+
+    public static void reduceSpentFormSp(String memberId, int amount) {
+        int left = getSpentFormSp(memberId) - amount;
+        Map<String, Object> m = member(memberId, false);
+        if (m == null) return;
+        if (left > 0) {
+            m.put(K_SPENT_FORM_SP, left);
+        } else {
+            m.remove(K_SPENT_FORM_SP);
+        }
     }
 
     public static void clearSpentFormSp(String memberId) {

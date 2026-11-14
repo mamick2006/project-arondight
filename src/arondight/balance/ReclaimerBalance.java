@@ -56,7 +56,7 @@ public final class ReclaimerBalance {
   public static final float DUTY_OUTER = 0.35f;
   public static final float DUTY_NEAR_LO = 0.35f, DUTY_NEAR_HI = 0.70f;
 
-  public static final float SPOTTER_MULT = 1f + (10f / 21f) * 0.5f;
+  public static final float SPOTTER_MULT = 1f + (10f / 21f) * 0.3f;
 
   public static final class Cell {
     public final String name;

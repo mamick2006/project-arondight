@@ -1,0 +1,2 @@
+command,class,tags,syntax,help
+ArondightRecallFrame,arondight.console.ArondightRecallFrame,"arondight,campaign",ArondightRecallFrame,"Moves your Arondight frame from storage back to your fleet, or makes another Arondight in your fleet your frame."
